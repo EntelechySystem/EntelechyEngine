@@ -1,10 +1,10 @@
 """
-生成散点分布
+函数：生成散点分布
 """
 
 import logging
 from engine.externals import np, njit, Optional
-from engine.Tools.AlgorithmTools import kmeans_numba
+from engine.tools.AlgorithmTools import kmeans_numba
 
 
 def generate_points(set_densityDistance: float = None, set_numPoints: int = None, set_circleRadius: float = None, circle_origin: np.array = np.array([0, 0]), num_samples=30, distribution='Normal', algorithm: Optional[str] = None, sigma: float = 1):
