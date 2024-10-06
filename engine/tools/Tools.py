@@ -383,7 +383,7 @@ class Tools:
         pass  # function
 
     @classmethod
-    def _copy_files_from_other_folders(cls, folderpath_source: Path, folderpath_target: Path, is_auto_confirmation: bool = False):
+    def copy_files_from_other_folders(cls, folderpath_source: Path, folderpath_target: Path, is_auto_confirmation: bool = False):
         """
         从指定的文件夹复制其全部的子文件夹及其子文件到目标文件夹。
 
@@ -519,7 +519,7 @@ class Tools:
         pass  # function
 
     @classmethod
-    def _delete_and_recreate_folder(cls, folderpath_target: Path, is_auto_confirmation: bool = False):
+    def delete_and_recreate_folder(cls, folderpath_target: Path, is_auto_confirmation: bool = False):
         """
         删除非空文件夹并重新创建文件夹。
 

@@ -32,7 +32,7 @@ def main(globals):
 
     # %% 预安装模型、数据，运行实验组
 
-    ## 设置主进程日志
+    # 设置主进程日志
     logger = logging.getLogger()
     logger.setLevel(int(globals['test_logging']))
     log_file_handler = logging.FileHandler(Path(globals['folderpath_experiments_output_log'], "outputlog.txt"))
@@ -45,17 +45,17 @@ def main(globals):
     if globals['is_ignore_warning']:
         warnings.filterwarnings("ignore")  # 忽略警告
 
-    ## 初始化、构建、安装模型
+    # 初始化、构建、安装模型
 
-    ## 读取设置文件为字典
+    # 读取设置文件为字典
     settings = DataManageTools.load_PKLs_to_DataFrames(Path(globals['folderpath_engine'], r"engine/data/Settings"))
     globals.update(settings)  # 将 settings 字典中的内容更新到 globals 字典中
 
-    ## 设置参数作业列表
+    # 设置参数作业列表
     with open(Path(globals['folderpath_experiments_output_parameters'], "parameters_works.pkl"), 'rb') as f:
         parameters_works = pd.read_pickle(f)
         num_parameters_works = len(parameters_works)
-        ## SQLite 数据库统计实验组之上一次的作业之完成情况
+        # SQLite 数据库统计实验组之上一次的作业之完成情况
         time_start_统计实验组作业情况 = timeit.default_timer()  # #DEBUG
         # 如果参数库当中的参数文件夹中的参数文件有更新，那么就要在后续删除原有的作业数据库再重建
         if os.path.exists(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db")):
@@ -128,10 +128,10 @@ def main(globals):
             }))
             pass  # with
 
-        ### 绘制色带分布图，展示实验组 id 分布对应的实验组作业运行之前的作业完成状态信息。#BUG 如果实验组很多，那么绘制图像会占用大量的内存与时间！可以考虑注释不运行这段。
+        # 绘制色带分布图，展示实验组 id 分布对应的实验组作业运行之前的作业完成状态信息。#BUG 如果实验组很多，那么绘制图像会占用大量的内存与时间！可以考虑注释不运行这段。
         # ids = [row[0] for row in rows]  # 获取实验组 id
         # status_实验组模拟程序_运行状态 = [row[1] for row in rows]  # 获取实验组作业状态
-        # Tools.draw_color_band_before_experiments(ids, status_实验组模拟程序_运行状态, list_idsExp_PLAN, list_idsExp_TASK, Path(sgv['folderpath_experiments_output_log'], "color_band_distribution_before_实验组模拟程序.png"))
+        # Tools.draw_color_band_before_experiments(ids, status_实验组模拟程序_运行状态, list_idsExp_PLAN, list_idsExp_TASK, Path(globals['folderpath_experiments_output_log'], "color_band_distribution_before_实验组模拟程序.png"))
 
         time_end_统计实验组作业情况 = timeit.default_timer()  # #DEBUG
         logging.debug(f"统计参数数据完成，用时：{time_end_统计实验组作业情况 - time_start_统计实验组作业情况} 秒。")  # #DEBUG
@@ -144,32 +144,29 @@ def main(globals):
 
     globals['len_parameters_works'] = num_parameters_works
 
-    ## 构建本次实验组所需的所有模型
+    # 构建本次实验组所需的所有模型
 
     # 如果处于测试状态，那么就不需要复制模型库里的模型到模拟器里了
-    if globals['is_develope_mode'] and globals['is_maintain_model_files_in_simulator_when_develope_mode']:
-        # 如果处于开发调试模式，则复制正在开发的模型到输出文件夹之配置文件夹下
-        Tools._delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
-        Tools._copy_files_from_other_folders(Path(globals['folderpath_engine'], "engine/data/models"), globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
+    if not (globals['is_develope_mode'] and globals['is_maintain_model_files_in_simulator_when_develope_mode']):
+        # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
+        Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_models'], globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_models'], Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
     else:
-        # 如果处于应用实验状态，则复制模型数据与内容到输出文件夹之配置文件夹下
-        Tools._delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools._copy_files_from_other_folders(globals['folderpath_models'], Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
-        Tools._copy_files_from_other_folders(globals['folderpath_models'], globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
         pass  # if
 
-    ## 导入实体数据，生成实体集、内容集并返回
+    # 导入实体数据，生成实体集、内容集并返回
     # Builder.build_entities_by_execute(globals)
-    models = Tools.import_modules_from_package(str(Path(globals['folderpath_experiments_output_models'], 'content')), r"[Cc]ontent_", globals['folderpath_engine'])
+    models = Tools.import_modules_from_package(str(Path(globals['folderpath_engine'], r'engine/data/models/content')), r"[Cc]ontent_", globals['folderpath_engine'])
 
-    ## 导出配置数据
+    # 导出配置数据
     Collector.export_config_data(globals)
 
     # ## 安装模型
     # globals, list_idsExp_TASK, parameters_works, models = Operator.operate_installing(globals)
 
-    ## 运行实验组
+    # 运行实验组
     logging.debug("\n\n\n实验组开始：\n\n")
 
     globals['experiments_running_time'] = 0  # 初始化实验组运行总时长
@@ -178,7 +175,7 @@ def main(globals):
     model = list(models.values())[0]  # 获取当前实验对应的模型。如果一次批处理只有一个模型，那么就用这个。
 
     # # 连接实验组作业管理数据库
-    # conn = sqlite3.connect(Path(sgv['folderpath_experiments_output_log'], "experiments_works_status.db"))
+    # conn = sqlite3.connect(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
     # c = conn.cursor()
     # c.execute("SELECT id,status FROM experiments WHERE status='TASK'")
     # rows = c.fetchall()
@@ -197,7 +194,7 @@ def main(globals):
         # num_cores = int(multiprocessing.cpu_count() * globals['percent_core_for_multiprocessing'])  # 计算 CPU 核心数
         #
         # ## 生成作业组
-        # # sgv['id_experiment'] = 0  # 设定当前实验编号
+        # # globals['id_experiment'] = 0  # 设定当前实验编号
         # works = []
         # for i, para in parameters_works_TASK.iterrows():
         #     exp_id = int(parameters_works_TASK.loc[i, 'exp_id'])  # 获取当前实验编号
@@ -225,7 +222,7 @@ def main(globals):
         pass
 
     else:
-        ## #NOTE：串行处理
+        # NOTE：串行处理
 
         globals['simulator_start_time'] = timeit.default_timer()  # 记录串行运行模式下，模拟器开始运行时刻
 
@@ -235,7 +232,7 @@ def main(globals):
             model = list(models.values())[0]  # 获取当前实验对应的模型。如果一次批处理只有一个模型，那么就用这个。
             globals['id_experiment'] = i + 1  # 设定当前实验编号
 
-            ## 运行一次实验作业
+            # 运行一次实验作业
             fun_single_experiment_work(globals['id_experiment'], globals, para, model)
             pass  # for
 
@@ -244,7 +241,7 @@ def main(globals):
 
         logging.info(f"实验组结束。\n实验组运行总时长：{globals['experiments_running_time']} 秒。\n导出数据运行总时长：{globals['export_data_running_time']} 秒。\n模拟器运行总时长：{globals['simulator_running_time']}秒。")
 
-        ## 默认程序打开输出文件查看
+        # 默认程序打开输出文件查看
         if globals['is_auto_open_outputlog']:
             system = platform.system()
             if system == 'Darwin':
@@ -262,13 +259,13 @@ def main(globals):
             warnings.filterwarnings("default")  # 恢复警告
             pass  # if
 
-        ## 关闭该程序之主进程日志记录器
+        # 关闭该程序之主进程日志记录器
         log_file_handler.close()
         logger.removeHandler(log_file_handler)
 
         pass  # if
 
-    ## 连接 SQLite 数据库，统计实验组之本次作业之完成情况
+    # 连接 SQLite 数据库，统计实验组之本次作业之完成情况
     num_parameters_works = len(parameters_works)
     time_start_统计实验组作业情况 = timeit.default_timer()  # #DEBUG
     conn = sqlite3.connect(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
@@ -306,10 +303,10 @@ def main(globals):
         }))
         pass  # with
 
-    ## 绘制色带分布图，展示实验组 id 分布对应的实验组作业运行之后的作业完成状态信息。#BUG 如果实验组很多，那么绘制图像会占用大量的内存与时间！可以考虑注释不运行这段。
+    # 绘制色带分布图，展示实验组 id 分布对应的实验组作业运行之后的作业完成状态信息。#BUG 如果实验组很多，那么绘制图像会占用大量的内存与时间！可以考虑注释不运行这段。
     # ids = [row[0] for row in rows]  # 获取实验组 id
     # status_实验组模拟程序_运行状态 = [row[1] for row in rows]  # 获取实验组作业状态
-    # Tools.draw_color_band_after_experiments(ids, status_实验组模拟程序_运行状态, Path(sgv['folderpath_experiments_output_log'], "color_band_distribution_after_实验组模拟程序.png"))
+    # Tools.draw_color_band_after_experiments(ids, status_实验组模拟程序_运行状态, Path(globals['folderpath_experiments_output_log'], "color_band_distribution_after_实验组模拟程序.png"))
 
     time_end_统计实验组作业情况 = timeit.default_timer()  # #DEBUG
     logging.debug(f"统计参数数据完成，用时：{time_end_统计实验组作业情况 - time_start_统计实验组作业情况} 秒。")  # #DEBUG
@@ -332,18 +329,18 @@ def fun_single_experiment_work(exp_id: int, globals: dict, para, model: dict):
     Returns:
         None
     """
-    sgv = deepcopy(globals)  # 复制全局变量，保证不同实验的全局变量的独立性
-    sgv['id_experiment'] = exp_id  # 设定当前实验编号
+    globals = deepcopy(globals)  # 复制全局变量，保证不同实验的全局变量的独立性
+    globals['id_experiment'] = exp_id  # 设定当前实验编号
 
-    ## TODO 进行实验作业
+    # TODO 进行实验作业
 
 
 pass  # function
 
 if __name__ == '__main__':
     # 从命令行参数获取配置字典
-    sgv_base64 = sys.argv[1]
-    sgv_pkl = base64.b64decode(sgv_base64)
-    globals = pickle.loads(sgv_pkl)
+    globals_base64 = sys.argv[1]
+    globals_pkl = base64.b64decode(globals_base64)
+    globals = pickle.loads(globals_pkl)
 
     main(globals)
