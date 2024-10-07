@@ -261,9 +261,11 @@ def main(globals):
             warnings.filterwarnings("default")  # 恢复警告
             pass  # if
 
-        # 关闭该程序之主进程日志记录器
+        ## 关闭日志记录器
         log_file_handler.close()
         logger.removeHandler(log_file_handler)
+        log_console_handler.close()
+        logger.removeHandler(log_console_handler)
 
         pass  # if
 
@@ -318,7 +320,7 @@ def main(globals):
     pass  # main
 
 
-def fun_single_experiment_work(exp_id: int, globals: dict, para, model: dict):
+def fun_single_experiment_work(exp_id: int, globals_original: dict, para, model: dict):
     """
     实验模拟程序。用于运行单个实验。
 
@@ -331,13 +333,14 @@ def fun_single_experiment_work(exp_id: int, globals: dict, para, model: dict):
     Returns:
         None
     """
-    globals = deepcopy(globals)  # 复制全局变量，保证不同实验的全局变量的独立性
+    globals = deepcopy(globals_original)  # 复制全局变量，保证不同实验的全局变量的独立性
     globals['id_experiment'] = exp_id  # 设定当前实验编号
 
-    # #NOW 进行实验作业
+    # 运行模型
+    model(para, globals)
 
+    pass  # function
 
-pass  # function
 
 if __name__ == '__main__':
     # 从命令行参数获取配置字典
