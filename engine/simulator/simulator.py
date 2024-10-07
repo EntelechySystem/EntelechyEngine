@@ -266,7 +266,7 @@ def simulator(config: dict):
             Tools.copy_files_from_other_folders(globals['folderpath_parameters'], Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
 
             if not globals['is_prerun_parameters_program']:  # 如果没有在实验主程序之前，预先运行了参数库相关的生成参数的程序，则运行生成参数的程序
-                Tools.run_python_program_file(Path(globals['folderpath_engine'], r"engine/data/parameters", r"parameters.py"), [globals['folderpath_experiments_output_parameters']])  # 运行参数作业程序
+                Tools.run_python_program_file(Path(globals['folderpath_engine'], r"engine/data/parameters", r"parameters.py"), [globals['folderpath_experiments_output_parameters']])  # 运行参数作业程序 #BUG 无法运行
 
             Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(globals['folderpath_parameters'], globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])
@@ -311,8 +311,8 @@ def simulator(config: dict):
             # 读取一行参数作业数据
             work = parameters_works.iloc[i]
             # 生成每个作业实验之文件夹、文件名（不含后缀名）为作业表的 id 列值（用 0 补齐缺的位数）
-            foldername_experiment = str(work['id']).zfill(len(str(len(parameters_works))))
-            filename_experiment_prefix = str(work['id']).zfill(len(str(len(parameters_works))))
+            foldername_experiment = str(work['exp_id']).zfill(len(str(len(parameters_works))))
+            filename_experiment_prefix = str(work['exp_id']).zfill(len(str(len(parameters_works))))
             filename_experiment_globals = filename_experiment_prefix + "_globals.pkl"
             filename_experiment_parameters_work = filename_experiment_prefix + "_parameters_work.pkl"
 
@@ -328,11 +328,11 @@ def simulator(config: dict):
                 pass  # with
             pass  # for
 
-        # 关闭日志记录器
-        log_file_handler.close()
-        logger.removeHandler(log_file_handler)
-        log_console_handler.close()
-        logger.removeHandler(log_console_handler)
+        # # 关闭日志记录器
+        # log_file_handler.close()
+        # logger.removeHandler(log_file_handler)
+        # log_console_handler.close()
+        # logger.removeHandler(log_console_handler)
 
         # 运行实验组模拟程序
         if not globals['is_develope_mode']:
@@ -349,9 +349,9 @@ def simulator(config: dict):
             main(globals)
             pass  # if
 
-        # 继续打开日志记录器
-        logger.addHandler(log_file_handler)
-        logger.addHandler(log_console_handler)
+        # # 继续打开日志记录器
+        # logger.addHandler(log_file_handler)
+        # logger.addHandler(log_console_handler)
 
         end_time = time.time()
         logging.info(f"\n模拟器运行时长：{end_time - start_time} 秒。\n")
@@ -369,16 +369,17 @@ def simulator(config: dict):
         globals_pkl = pickle.dumps(globals)
         globals_base64 = base64.b64encode(globals_pkl).decode('utf-8')
         start_time = time.time()
-        subprocess.run(["python", str(Path(globals['folderpath_engine'], 'Data/programs/visualize_data_program.py')), globals_base64])
+        subprocess.run(["python", str(Path(globals['folderpath_engine'], 'data/programs/visualize_data_program.py')), globals_base64])
         end_time = time.time()
         print(f"\n可视化数据运行总时长：{end_time - start_time} 秒。\n")
         pass  # if
 
-    # # %% 清理 #HACK 未开发
-    # ## 删除设置文件夹、模型文件夹内的所有文件，但是保留文件夹
-    # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/Config"), is_auto_confirmation=globals['is_auto_confirmation'])
-    # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/Parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
-    # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=globals['is_auto_confirmation'])
-    # if not globals['is_develope_model']:
-    #     Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/Models"), is_auto_confirmation=globals['is_auto_confirmation'])
-    #     pass  # if
+    # %% 清理 #HACK 未开发
+    ## 删除设置文件夹、模型文件夹内的所有文件，但是保留文件夹
+    Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/config"), is_auto_confirmation=globals['is_auto_confirmation'])
+    Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
+    Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=globals['is_auto_confirmation'])
+    Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/settings"), is_auto_confirmation=globals['is_auto_confirmation'])
+    if not globals['is_develope_model']:
+        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
+        pass  # if
