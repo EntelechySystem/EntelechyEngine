@@ -16,7 +16,7 @@ def main(globals):
     """
     实验组模拟程序。用于运行实验组。
     """
-    # # %% 设置工作目录。
+    # # %% 设置工作目录。 #FIXME #TODO
     # # folderpath_settings=Tools.setup_working_directory()
     # if Path(sys.argv[0]).name == Path(__file__).name:
     #     # 在控制台运行，切换到脚本所在的文件夹
@@ -109,6 +109,8 @@ def main(globals):
                 list_idsExp_RAW.append(exp_id)
                 pass  # if
             pass  # for
+
+        globals['list_idsExperiment_to_run'] = eval(globals['list_idsExperiment_to_run'])  # 将未运行过的实验组 id 列表转换为 JSON 字符串
         list_idsExp_PLAN = globals['list_idsExperiment_to_run'] if len(globals['list_idsExperiment_to_run']) != 0 else list(range(1, num_parameters_works + 1))
         list_idsExp_TASK = [i for i in list_idsExp_PLAN if i not in list_idsExp_DONE]
         # 保存实验组作业完成状态信息
@@ -332,7 +334,7 @@ def fun_single_experiment_work(exp_id: int, globals: dict, para, model: dict):
     globals = deepcopy(globals)  # 复制全局变量，保证不同实验的全局变量的独立性
     globals['id_experiment'] = exp_id  # 设定当前实验编号
 
-    # TODO 进行实验作业
+    # #NOW 进行实验作业
 
 
 pass  # function
