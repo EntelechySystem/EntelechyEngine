@@ -27,14 +27,6 @@ def simulator(config: dict):
     config['folderpath_project'] = Tools.get_project_rootpath()
     config['folderpath_engine'] = Tools.get_project_rootpath(config['foldername_engine'], config['folderpath_relpath_engine'])
 
-    # # %% 由本模拟器复制一份完整的模拟器工程文件夹到项目文件夹中使用 ！HACK 这个很危险，容易删除模拟器工程文件夹！需要谨慎使用！
-    # Tools._delete_and_recreate_folder(Path(config['folderpath_project'], r"engine"), is_auto_confirmation=config['is_auto_confirmation'])
-    # Tools._copy_files_from_other_folders(Path(config['folderpath_engine'], r"engine"), Path(config['folderpath_project'], r"engine"), is_auto_confirmation=config['is_auto_confirmation'])
-
-    # %% 读写文件夹：如果 Library 之 Config 有内容，那么就删除，否则就从其他文件夹中复制之后再导入
-    # Tools._delete_and_recreate_folder(Path(config['folderpath_engine'], r"engine/data/Config").resolve(), is_auto_confirmation=config['is_auto_confirmation'])
-    # Tools._copy_files_from_other_folders(Path(config['folderpath_project'], config['folderpath_config']), Path(config['folderpath_engine'], "engine/data/Config").resolve(), is_auto_confirmation=config['is_auto_confirmation'])
-
     # %% 运行配置程序
     if not config['is_prerun_config_program']:
         Tools.run_python_program_file(Path(config['folderpath_engine'], r"engine/data/Config/config.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
@@ -48,8 +40,6 @@ def simulator(config: dict):
     globals.update(config)
 
     # 设置相关的实验文件夹名称
-    # if globals['schedule_operation']['实验组模拟程序'] is True:
-    # pass  # if
     globals['foldername_experiments_output'] = Tools.set_foldername_experiments(globals['foldername_prefix_experiments'], globals['foldername_set_manually'], globals['is_datetime'], globals['type_of_experiments_foldername'])
 
     # 生成实验相关的文件夹用于本批次运作
@@ -86,89 +76,15 @@ def simulator(config: dict):
         str_folderpath_agents=globals['folderpath_agents'],
     )
 
-    # # %% 运行配置程序
-    # Tools.run_python_program_file(Path(globals['folderpath_engine'], r"engine/data/settings/settings.py").resolve(), [Path(globals['folderpath_engine'], r"engine/data/settings").resolve()])
-
-    # ## 读取设置文件为字典
-    # settings = DataManageTools.load_PKLs_to_DataFrames(Path(globals['folderpath_engine'], r"engine/data/settings"))
-
-    # globals.update(settings)  # 将 settings 字典中的内容更新到 globals 字典中
-
-    # # 设置参数
-
-    # # # 如果参数库当中的参数文件夹中的参数文件有更新，那么就要在后续重新生成参数作业数据
-    # if Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.xlsx").resolve().exists():
-    #     mtime_of_file_parameters_xlsx = Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.xlsx").resolve().stat().st_mtime
-    #     mtime_of_file_parameters_py = Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.py").resolve().stat().st_mtime
-    #     # filepath_parameters_works_pkl = Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.pkl").resolve()
-    #     filepath_parameters_works_pkl = Path(globals['folderpath_experiments_output_parameters'], r"parameters")
-    #     if filepath_parameters_works_pkl.exists():
-    #         # mtime_of_file_parameters_works_pkl = Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.pkl").resolve().stat().st_mtime
-    #         mtime_of_file_parameters_works_pkl = Path(globals['folderpath_experiments_output_parameters'], r"parameters").resolve().stat().st_mtime
-    #         # if (mtime_of_file_parameters_xlsx > mtime_of_file_parameters_works_pkl or mtime_of_file_parameters_py > mtime_of_file_parameters_works_pkl) and globals['运行模式'] == '批量实验作业运行模式':
-    #         if (mtime_of_file_parameters_xlsx > mtime_of_file_parameters_works_pkl or mtime_of_file_parameters_py > mtime_of_file_parameters_works_pkl):
-    #             is_generate_parameters_works_data = True
-    #             print("参数文件有更新，需要重新生成参数作业数据。")
-    #         else:
-    #             is_generate_parameters_works_data = False
-    #             print("参数文件没有更新，不需要重新生成参数作业数据。")
-    #             pass  # if
-    #     else:
-    #         is_generate_parameters_works_data = True
-    #         print("参数作业数据文件不存在，需要重新生成参数作业数据。")
-    #         pass  # if
-
-    # # 运行参数作业程序
-    # if is_generate_parameters_works_data:
-    #     # 读写文件夹：如果 Library 之 Parameters 有内容，那么就删除，否则就从其他文件夹中复制之后再导入
-    #     Tools.delete_and_recreate_folder(Path(globals['folderpath_experiments_output_parameters']), is_auto_confirmation=globals['is_auto_confirmation'])
-    #     Tools.copy_files_from_other_folders(globals['folderpath_parameters'], globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])  # 导出一份到输出文件夹
-    #     Tools.run_python_program_file(Path(globals['folderpath_experiments_output_parameters'], r"parameters.py"), [globals['folderpath_experiments_output_parameters']])
-    #     # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
-    #     # Tools._copy_files_from_other_folders(Path(globals['folderpath_project'], globals['folderpath_parameters']), Path(globals['folderpath_engine'], "engine/data/parameters").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])  # 复制一份到引擎临时数据文件夹   # #TODO 无用，可以删除
-    #     # 运行参数作业程序（#NOTE：可选）
-    #     # Tools.run_python_program_file(Path(globals['folderpath_engine'], r"engine/data/parameters/parameters.py").resolve(), [Path(globals['folderpath_engine'], r"engine/data/parameters").resolve()])  # #TODO 无用，可以删除
-    #     pass  # if
-
-    # # 读取参数作业数据
-    # dict_parameters_works = DataManageTools.load_PKLs_to_DataFrames(globals['folderpath_experiments_output_parameters'])
-    # # dict_parameters_works = DataManageTools.load_PKLs_to_DataFrames(Path(globals['folderpath_engine'], r"engine/data/parameters"))
-    # parameters_works = dict_parameters_works['parameters_works']
-
-    # # 导出参数作业信息为 PKL 文件
-    # with open(Path(globals['folderpath_experiments_output_parameters'], r"parameters_works.pkl").resolve(), 'wb') as f:
-    #     pickle.dump(parameters_works, f)  # 导出一份到输出文件夹
-    #     pass  # with
-    # # with open(Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.pkl").resolve(), 'wb') as f:
-    # #     pickle.dump(parameters_works, f)  # 导出一份到模拟器库文件夹
-    # #     pass  # with
-
-    # # 导出参数作业信息为 xlsx 文件
-    # with open(Path(globals['folderpath_experiments_output_parameters'], r"parameters_works.xlsx").resolve(), 'wb') as f:
-    #     parameters_works.to_excel(f, index=False)
-    #     pass  # with
-    # # with open(Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.xlsx").resolve(), 'wb') as f:
-    # #     parameters_works.to_excel(f, index=False)
-    # #     pass  # with
-    # globals['num_parameters_works'] = parameters_works.shape[0]
-
-    # # globals.update(parameters_works)  # 将 parameters 字典中的内容更新到 globals 字典中
-
-    # pass  # if
-
     Tools.flatten_dict(globals, 1)  # 将 globals 字典中的内容扁平化
 
     # 导出全局变量 globals 字典为 PKL 文件
     globals_expert = deepcopy(globals)
     Tools.transform_all_Path_value_to_string(globals_expert)  # 转换字典里所有 Path 对象为字符串。
     Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_config'], is_auto_confirmation=globals['is_auto_confirmation'])
-    # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/globals").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
     with open(Path(globals['folderpath_experiments_output_config'], r"globals.pkl").resolve(), 'wb') as f:
         pickle.dump(globals_expert, f)  # 导出一份到输出文件夹
         pass  # with
-    # with open(Path(globals['folderpath_engine'], r"engine/data/globals/globals.pkl").resolve(), 'wb') as f:
-    #     pickle.dump(globals_expert, f)  # 导出一份到模拟器库文件夹
-    #     pass  # with
 
     # %% 是否运作模拟程序
     if globals['program_实验组模拟程序']:
@@ -182,23 +98,6 @@ def simulator(config: dict):
         Tools.copy_files_from_other_folders(globals['folderpath_settings'], globals['folderpath_experiments_output_settings'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/settings").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_settings'], Path(globals['folderpath_engine'], "engine/data/settings").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
-
-        # Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.copy_files_from_other_folders(globals['folderpath_parameters'], globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.copy_files_from_other_folders(globals['folderpath_parameters'], Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
-        # # shutil.copy(Path(globals['folderpath_parameters'], r"set_parameters_variables.py"), globals['folderpath_experiments_output_parameters'])  # 导出一份生成参数的代码文件到输出文件夹
-
-        # Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_agents'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.copy_files_from_other_folders(globals['folderpath_agents'], globals['folderpath_experiments_output_agents'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.copy_files_from_other_folders(globals['folderpath_agents'], Path(globals['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=globals['is_auto_confirmation'])
-        # # from engine.core.define.define_agentsVariables import dict_agent, dict_interagent
-
-        # Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.copy_files_from_other_folders(globals['folderpath_models'], globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
-        # Tools.copy_files_from_other_folders(globals['folderpath_models'], Path(globals['folderpath_engine'], r"engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
 
         # 获取一些系统信息
         globals['system_platform'] = platform.system()
@@ -214,6 +113,7 @@ def simulator(config: dict):
                 file.unlink()
             pass  # if
 
+        # 打开日志
         logger = logging.getLogger()
         logger.setLevel(int(globals['test_logging']))
 
@@ -241,12 +141,9 @@ def simulator(config: dict):
         if Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.xlsx").resolve().exists():
             mtime_of_file_parameters_xlsx = Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.xlsx").resolve().stat().st_mtime
             mtime_of_file_parameters_py = Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.py").resolve().stat().st_mtime
-            # filepath_parameters_works_pkl = Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.pkl").resolve()
             filepath_parameters_works_pkl = Path(globals['folderpath_experiments_output_parameters'], r"parameters")
             if filepath_parameters_works_pkl.exists():
-                # mtime_of_file_parameters_works_pkl = Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.pkl").resolve().stat().st_mtime
                 mtime_of_file_parameters_works_pkl = Path(globals['folderpath_experiments_output_parameters'], r"parameters").resolve().stat().st_mtime
-                # if (mtime_of_file_parameters_xlsx > mtime_of_file_parameters_works_pkl or mtime_of_file_parameters_py > mtime_of_file_parameters_works_pkl) and globals['运行模式'] == '批量实验作业运行模式':
                 if (mtime_of_file_parameters_xlsx > mtime_of_file_parameters_works_pkl or mtime_of_file_parameters_py > mtime_of_file_parameters_works_pkl):
                     is_generate_parameters_works_data = True
                     logging.info("参数文件有更新，需要重新生成参数作业数据。")
@@ -270,19 +167,10 @@ def simulator(config: dict):
 
             Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(globals['folderpath_parameters'], globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])
-            # shutil.copy(Path(globals['folderpath_parameters'], r"set_parameters_variables.py"), globals['folderpath_experiments_output_parameters'])  # 导出一份生成参数的代码文件到输出文件夹
-
-            # Tools.delete_and_recreate_folder(Path(globals['folderpath_experiments_output_parameters']), is_auto_confirmation=globals['is_auto_confirmation'])
-            # Tools.copy_files_from_other_folders(globals['folderpath_parameters'], globals['folderpath_experiments_output_parameters'], is_auto_confirmation=globals['is_auto_confirmation'])  # 导出一份到输出文件夹
-            # # Tools._delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
-            # # Tools._copy_files_from_other_folders(Path(globals['folderpath_project'], globals['folderpath_parameters']), Path(globals['folderpath_engine'], "engine/data/parameters").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])  # 复制一份到引擎临时数据文件夹   # #TODO 无用，可以删除
-            # 运行参数作业程序（#NOTE：可选）
-            # Tools.run_python_program_file(Path(globals['folderpath_engine'], r"engine/data/parameters/parameters.py").resolve(), [Path(globals['folderpath_engine'], r"engine/data/parameters").resolve()])  # #TODO 无用，可以删除
             pass  # if
 
         # 读取参数作业数据
         dict_parameters_works = DataManageTools.load_PKLs_to_DataFrames(globals['folderpath_experiments_output_parameters'])
-        # dict_parameters_works = DataManageTools.load_PKLs_to_DataFrames(Path(globals['folderpath_engine'], r"engine/data/parameters"))
         parameters_works = dict_parameters_works['parameters_works']
 
         # 导出参数作业信息为 PKL 文件
@@ -297,9 +185,6 @@ def simulator(config: dict):
         with open(Path(globals['folderpath_experiments_output_parameters'], r"parameters_works.xlsx").resolve(), 'wb') as f:
             parameters_works.to_excel(f, index=False)
             pass  # with
-        # with open(Path(globals['folderpath_engine'], r"engine/data/parameters/parameters_works.xlsx").resolve(), 'wb') as f:
-        #     parameters_works.to_excel(f, index=False)
-        #     pass  # with
         globals['num_parameters_works'] = parameters_works.shape[0]
 
         # globals.update(parameters_works)  # 将 parameters 字典中的内容更新到 globals 字典中
@@ -328,11 +213,11 @@ def simulator(config: dict):
                 pass  # with
             pass  # for
 
-        # # 关闭日志记录器
-        # log_file_handler.close()
-        # logger.removeHandler(log_file_handler)
-        # log_console_handler.close()
-        # logger.removeHandler(log_console_handler)
+        # 关闭日志记录器
+        log_file_handler.close()
+        logger.removeHandler(log_file_handler)
+        log_console_handler.close()
+        logger.removeHandler(log_console_handler)
 
         # 运行实验组模拟程序
         if not globals['is_develope_mode']:
@@ -349,9 +234,9 @@ def simulator(config: dict):
             main(globals)
             pass  # if
 
-        # # 继续打开日志记录器
-        # logger.addHandler(log_file_handler)
-        # logger.addHandler(log_console_handler)
+        # 继续打开日志记录器
+        logger.addHandler(log_file_handler)
+        logger.addHandler(log_console_handler)
 
         end_time = time.time()
         logging.info(f"\n模拟器运行时长：{end_time - start_time} 秒。\n")
