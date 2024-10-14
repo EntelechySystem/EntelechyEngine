@@ -88,16 +88,23 @@ def simulator(config: dict):
 
     # %% 是否运作模拟程序
     if globals['program_实验组模拟程序']:
-        # 导入相关数据
+        # 导入相关配置项
         Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_config'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_config'], globals['folderpath_experiments_output_config'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], "engine/data/config"), is_auto_confirmation=config['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_config'], Path(globals['folderpath_engine'], "engine/data/config"), is_auto_confirmation=globals['is_auto_confirmation'])
 
+        # 导入相关设置项
         Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_settings'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_settings'], globals['folderpath_experiments_output_settings'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/settings").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_settings'], Path(globals['folderpath_engine'], "engine/data/settings").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+
+        # 导入相关个体众数据库
+        Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_agents'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_agents'], globals['folderpath_experiments_output_agents'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_agents'], Path(globals['folderpath_engine'], "engine/data/agents").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
 
         # 获取一些系统信息
         globals['system_platform'] = platform.system()
