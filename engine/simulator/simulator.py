@@ -29,7 +29,8 @@ def simulator(config: dict):
 
     # %% 运行配置程序
     if not config['is_prerun_config_program']:
-        Tools.run_python_program_file(Path(config['folderpath_engine'], r"engine/data/Config/config.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
+        # Tools.run_python_program_file(Path(config['folderpath_engine'], r"engine/data/Config/config.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
+        result = Tools.run_python_program_file(Path(config['folderpath_project'], config['folderpath_config'], r"config.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
 
     # 读取配置文件为字典
     with open(Path(config['folderpath_project'], config['folderpath_config'], r"config.pkl").resolve(), 'rb') as f:

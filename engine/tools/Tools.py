@@ -699,12 +699,13 @@ class Tools:
         """
         if list_args is not None:
             list_args_base64 = cls.encode_args(list_args)
-            subprocess.run(["python", str(filepath_python_program), *list_args_base64])
+            result = subprocess.run(["python", str(filepath_python_program), *list_args_base64], check=True)
         else:
-            subprocess.run(["python", str(filepath_python_program)])
+            result = subprocess.run(["python", str(filepath_python_program)], check=True)
             pass  # if
 
         print(f"运行{filepath_python_program.name}！")
+        return result
 
         pass  # function
 
@@ -874,7 +875,6 @@ class Tools:
             pass  # with
 
         pass  # function
-
 
     @classmethod
     def draw_color_band_before_experiments(ids: list, process_status: list, plans_status: list, tasks_status: list, filepath_to_save: Path):
