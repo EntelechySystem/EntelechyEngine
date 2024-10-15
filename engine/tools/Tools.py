@@ -591,22 +591,7 @@ class Tools:
         #     return transformed_data
         pass  # function
 
-    @classmethod
-    def generate_unique_identifier(cls):
-        """
-        随机生成一个8位的英文大小写字母和阿拉伯数字混合的字符串作为id。
 
-        注意，区分大小写。
-
-        Returns:
-            str: id字符串
-        """
-        while True:
-            # 生成一个随机的字符串
-            new_identifier = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-
-            return new_identifier
-        pass  # function
 
     @classmethod
     def get_folder_info(cls, work_address, folder_source, folder_target, suffix_source, suffix_target):

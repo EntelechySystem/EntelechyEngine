@@ -3,6 +3,7 @@
 
 #HACK 没有做覆盖性的单元测试。目前只要求能够在主程序中正确运行就好。
 """
+from engine.externals import Union, Any
 
 
 class AttributeComponent:
