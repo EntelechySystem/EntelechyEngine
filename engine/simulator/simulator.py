@@ -21,6 +21,7 @@ def simulator(config: dict):
     from engine import os, platform, logging, Path, shutil, datetime, time, subprocess, pickle, base64, deepcopy
     from engine.tools.Tools import Tools
     from engine.tools.DataManageTools import DataManageTools
+    from engine.core.define_engineGlobalVariables import globals
 
     # %% 初始化
     # 获取项目路径、模拟器工具路径
@@ -37,7 +38,6 @@ def simulator(config: dict):
         config = pickle.load(f)
 
     # config 赋值给全局变量 globals
-    globals = dict()
     globals.update(config)
 
     # 设置相关的实验文件夹名称
