@@ -32,13 +32,13 @@ def main(globals):
 
     # %% 预安装模型、数据，运行实验组
 
-    # 设置主进程日志
-    logger = logging.getLogger()
-    logger.setLevel(int(globals['test_logging']))
-    log_file_handler = logging.FileHandler(Path(globals['folderpath_experiments_output_log'], "outputlog.txt"))
-    logger.addHandler(log_file_handler)
-    log_console_handler = logging.StreamHandler()
-    logger.addHandler(log_console_handler)
+    # # 设置主进程日志
+    # logger = logging.getLogger()
+    # logger.setLevel(int(globals['test_logging']))
+    # log_file_handler = logging.FileHandler(Path(globals['folderpath_experiments_output_log'], "outputlog.txt"))
+    # logger.addHandler(log_file_handler)
+    # log_console_handler = logging.StreamHandler()
+    # logger.addHandler(log_console_handler)
 
     # %% 预安装模型、数据，运行实验组
 
@@ -136,7 +136,7 @@ def main(globals):
         # Tools.draw_color_band_before_experiments(ids, status_实验组模拟程序_运行状态, list_idsExp_PLAN, list_idsExp_TASK, Path(globals['folderpath_experiments_output_log'], "color_band_distribution_before_实验组模拟程序.png"))
 
         time_end_统计实验组作业情况 = timeit.default_timer()  # #DEBUG
-        logging.debug(f"统计参数数据完成，用时：{time_end_统计实验组作业情况 - time_start_统计实验组作业情况} 秒。")  # #DEBUG
+        logging.info(f"统计参数数据完成，用时：{time_end_统计实验组作业情况 - time_start_统计实验组作业情况} 秒。")  # #DEBUG
 
         conn.close()  # 关闭数据库连接
         pass  # with
@@ -149,7 +149,7 @@ def main(globals):
     # 构建本次实验组所需的所有模型
 
     # 如果处于测试状态，那么就不需要复制模型库里的模型到模拟器里了
-    if not (globals['is_develope_mode'] and globals['is_maintain_model_files_in_simulator_when_develope_mode']):
+    if not (globals['is_develop_mode'] and globals['is_maintain_model_files_in_simulator_when_develop_mode']):
         # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
         Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_models'], globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
@@ -169,7 +169,7 @@ def main(globals):
     # globals, list_idsExp_TASK, parameters_works, models = Operator.operate_installing(globals)
 
     # 运行实验组
-    logging.debug("\n\n\n实验组开始：\n\n")
+    logging.info("\n\n\n实验组开始：\n\n")
 
     globals['experiments_running_time'] = 0  # 初始化实验组运行总时长
     globals['export_data_running_time'] = 0  # 初始化导出数据运行总时长
@@ -261,11 +261,11 @@ def main(globals):
             warnings.filterwarnings("default")  # 恢复警告
             pass  # if
 
-        ## 关闭日志记录器
-        log_file_handler.close()
-        logger.removeHandler(log_file_handler)
-        log_console_handler.close()
-        logger.removeHandler(log_console_handler)
+        # ## 关闭日志
+        # log_file_handler.close()
+        # logger.removeHandler(log_file_handler)
+        # log_console_handler.close()
+        # logger.removeHandler(log_console_handler)
 
         pass  # if
 
@@ -313,7 +313,7 @@ def main(globals):
     # Tools.draw_color_band_after_experiments(ids, status_实验组模拟程序_运行状态, Path(globals['folderpath_experiments_output_log'], "color_band_distribution_after_实验组模拟程序.png"))
 
     time_end_统计实验组作业情况 = timeit.default_timer()  # #DEBUG
-    logging.debug(f"统计参数数据完成，用时：{time_end_统计实验组作业情况 - time_start_统计实验组作业情况} 秒。")  # #DEBUG
+    logging.info(f"统计参数数据完成，用时：{time_end_统计实验组作业情况 - time_start_统计实验组作业情况} 秒。")  # #DEBUG
 
     conn.close()  # 关闭数据库连接
 
