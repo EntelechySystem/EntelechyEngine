@@ -110,8 +110,7 @@ def simulator(config: dict):
         # 获取一些系统信息
         globals['system_platform'] = platform.system()
 
-        # 设置日志
-
+        ## 设置日志
         if globals['is_rerun_all_done_works_in_the_same_experiments']:
             # 删除原有的主日志文件
             for file in Path(globals['folderpath_experiments_output_log']).glob("outputlog.txt"):
@@ -130,7 +129,7 @@ def simulator(config: dict):
         log_console_handler = logging.StreamHandler()
         logger.addHandler(log_console_handler)
 
-        if globals['is_develope_mode']:
+        if globals['is_develop_mode']:
             logging.info("\n------------ 开发与调试模式！ ---------------\n")
             pass  # if
         logging.info("\n开始记录时间：" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
@@ -221,14 +220,14 @@ def simulator(config: dict):
                 pass  # with
             pass  # for
 
-        # 关闭日志记录器
-        log_file_handler.close()
-        logger.removeHandler(log_file_handler)
-        log_console_handler.close()
-        logger.removeHandler(log_console_handler)
+        # # 关闭日志
+        # log_file_handler.close()
+        # logger.removeHandler(log_file_handler)
+        # log_console_handler.close()
+        # logger.removeHandler(log_console_handler)
 
-        # 运行实验组模拟程序
-        if not globals['is_develope_mode']:
+        ## 运行实验组模拟程序
+        if not globals['is_develop_mode']:
             globals_pkl = pickle.dumps(globals)
             globals_base64 = base64.b64encode(globals_pkl).decode('utf-8')
             # para_pkl = pickle.dumps(para)
@@ -242,14 +241,14 @@ def simulator(config: dict):
             main(globals)
             pass  # if
 
-        # 继续打开日志记录器
-        logger.addHandler(log_file_handler)
-        logger.addHandler(log_console_handler)
+        # # 继续打开日志
+        # logger.addHandler(log_file_handler)
+        # logger.addHandler(log_console_handler)
 
         end_time = time.time()
         logging.info(f"\n模拟器运行时长：{end_time - start_time} 秒。\n")
 
-        # 关闭日志记录器
+        # 关闭日志
         log_file_handler.close()
         logger.removeHandler(log_file_handler)
         log_console_handler.close()
@@ -273,6 +272,6 @@ def simulator(config: dict):
     Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
     Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=globals['is_auto_confirmation'])
     Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/settings"), is_auto_confirmation=globals['is_auto_confirmation'])
-    if not globals['is_develope_model']:
+    if not (globals['is_develop_model'] and globals['is_maintain_model_files_in_simulator_when_develop_mode']):
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
         pass  # if
