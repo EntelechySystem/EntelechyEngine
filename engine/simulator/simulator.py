@@ -56,7 +56,11 @@ def simulator(config: dict):
         globals['folderpath_experiments_output_parameters'],
         globals['folderpath_experiments_output_agents'],
         globals['folderpath_experiments_output_models'],
+        globals['folderpath_experiments_output_world_environment'],
+        globals['folderpath_experiments_output_world_conception_knowledge'],
         globals['folderpath_models'],
+        globals['folderpath_world_environment'],
+        globals['folderpath_world_conception_knowledge'],
         globals['folderpath_config'],
         globals['folderpath_settings'],
         globals['folderpath_parameters'],
@@ -71,6 +75,8 @@ def simulator(config: dict):
         str_foldername_outputData=globals['foldername_outputData'],
         str_folderpath_relpath_outputData=globals['folderpath_relpath_outputData'],
         str_folderpath_models=globals['folderpath_models'],
+        str_folderpath_world_environment=globals['folderpath_world_environment'],
+        str_folderpath_world_conception_knowledge=globals['folderpath_world_conception_knowledge'],
         str_folderpath_config=globals['folderpath_config'],
         str_folderpath_settings=globals['folderpath_settings'],
         str_folderpath_parameters=globals['folderpath_parameters'],
@@ -106,6 +112,18 @@ def simulator(config: dict):
         Tools.copy_files_from_other_folders(globals['folderpath_agents'], globals['folderpath_experiments_output_agents'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_agents'], Path(globals['folderpath_engine'], "engine/data/agents").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+
+        # 导入相关世界环境模型
+        Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_world_environment'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_world_environment'], globals['folderpath_experiments_output_world_environment'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/world_environment").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_world_environment'], Path(globals['folderpath_engine'], "engine/data/world_environment").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+
+        # 导入相关世界概念知识模型
+        Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_world_conception_knowledge'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_world_conception_knowledge'], globals['folderpath_experiments_output_world_conception_knowledge'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/world_conception_knowledge").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_world_conception_knowledge'], Path(globals['folderpath_engine'], "engine/data/world_conception_knowledge").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
 
         # 获取一些系统信息
         globals['system_platform'] = platform.system()
