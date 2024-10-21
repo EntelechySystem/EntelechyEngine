@@ -48,26 +48,29 @@ def simulator(config: dict):
         globals['folderpath_project'],
         globals['folderpath_engine'],
         globals['folderpath_experiments_projects'],
+        globals['folderpath_system'],
+        globals['folderpath_config'],
+        globals['folderpath_parameters'],
+        globals['folderpath_models'],
+        globals['folderpath_settings'],
+        globals['folderpath_world_conception_knowledge'],
+        globals['folderpath_world_environment'],
+        globals['folderpath_agents'],
         globals['folderpath_experiments_output'],
         globals['folderpath_experiments_output_data'],
         globals['folderpath_experiments_output_log'],
+        globals['folderpath_experiments_output_system'],
         globals['folderpath_experiments_output_config'],
-        globals['folderpath_experiments_output_settings'],
         globals['folderpath_experiments_output_parameters'],
-        globals['folderpath_experiments_output_agents'],
         globals['folderpath_experiments_output_models'],
-        globals['folderpath_experiments_output_world_environment'],
+        globals['folderpath_experiments_output_settings'],
         globals['folderpath_experiments_output_world_conception_knowledge'],
-        globals['folderpath_models'],
-        globals['folderpath_world_environment'],
-        globals['folderpath_world_conception_knowledge'],
-        globals['folderpath_config'],
-        globals['folderpath_settings'],
-        globals['folderpath_parameters'],
-        globals['folderpath_agents'],
+        globals['folderpath_experiments_output_world_environment'],
+        globals['folderpath_experiments_output_agents'],
     ) = (Tools.set_experiments_folders(
-        str_folderpath_config=globals['folderpath_config'],
         str_folderpath_experiments_projects=globals['folderpath_experiments_projects'],
+        str_folderpath_system=globals['folderpath_system'],
+        str_folderpath_config=globals['folderpath_config'],
         str_folderpath_parameters=globals['folderpath_parameters'],
         str_foldername_engine=globals['foldername_engine'],
         str_folderpath_relpath_engine=globals['folderpath_relpath_engine'],
@@ -84,8 +87,8 @@ def simulator(config: dict):
         str_folderpath_relpath_outputData=globals['folderpath_relpath_outputData'],
         str_foldername_outputData=globals['foldername_outputData'],
         foldername_experiments_output=globals['foldername_experiments_output'],
-        foldername_experiments_output_data=globals['foldername_experiments_output_data'])
-    )
+        foldername_experiments_output_data=globals['foldername_experiments_output_data']
+    ))
 
     Tools.flatten_dict(globals, 1)  # 将 globals 字典中的内容扁平化
 
@@ -110,6 +113,16 @@ def simulator(config: dict):
         Tools.copy_files_from_other_folders(globals['folderpath_settings'], globals['folderpath_experiments_output_settings'], is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/settings").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(globals['folderpath_settings'], Path(globals['folderpath_engine'], "engine/data/settings").resolve(), is_auto_confirmation=globals['is_auto_confirmation'])
+
+        # 导入智能模型（模型）
+        if not (globals['is_develop_mode'] and globals['is_maintain_files_in_simulator_when_develop_mode']):
+            # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
+            Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(globals['folderpath_models'], globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(globals['folderpath_models'], Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
+        else:
+            pass  # if
 
         # 导入相关个体众数据库
         Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_agents'], is_auto_confirmation=globals['is_auto_confirmation'])
@@ -156,12 +169,17 @@ def simulator(config: dict):
             pass  # if
         logging.info("\n开始记录时间：" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
         logging.info("\n实验组名称：" + globals['foldername_experiments_output'] + "\n")
-        logging.info("\n模拟器 simulator 版本：" + globals['engine_version'] + "\n")
-        logging.info("\n相关实验配置项 config 文件夹：" + globals['folderpath_config'].name + "\n")
-        logging.info("\n相关实验 agents 数据文件夹：" + globals['folderpath_agents'].name + "\n")
-        logging.info("\n相关实验参数 parameters 文件夹：" + globals['folderpath_parameters'].name + "\n")
-        logging.info("\n相关实验 models 文件夹：" + globals['folderpath_models'].name + "\n")
-        logging.info("\n相关实验数据 experiments output data 文件夹：" + globals['folderpath_experiments_output'].name + "\n")
+        logging.info("\n引擎版本：" + globals['engine_version'] + "\n")
+        logging.info("\n实验项目文件夹：" + globals['folderpath_project'].name + "\n")
+        logging.info("\n相关系统文件夹：" + globals['folderpath_system'].name + "\n")
+        logging.info("\n相关实验配置项文件夹：" + globals['folderpath_config'].name + "\n")
+        logging.info("\n相关实验参数作业文件夹：" + globals['folderpath_parameters'].name + "\n")
+        logging.info("\n相关实验智能模型文件夹：" + globals['folderpath_models'].name + "\n")
+        logging.info("\n相关实验设置文件夹：" + globals['folderpath_settings'].name + "\n")
+        logging.info("\n相关实验世界概念知识文件夹：" + globals['folderpath_world_conception_knowledge'].name + "\n")
+        logging.info("\n相关实验世界环境文件夹：" + globals['folderpath_world_environment'].name + "\n")
+        logging.info("\n相关实验智能体众数据文件夹：" + globals['folderpath_agents'].name + "\n")
+        logging.info("\n相关实验结果数据文件夹：" + globals['folderpath_experiments_output'].name + "\n")
 
         # 部署「运行实验组模拟程序」之相关配置项、文件夹
         # 设置参数
@@ -295,6 +313,6 @@ def simulator(config: dict):
     Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
     Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=globals['is_auto_confirmation'])
     Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/settings"), is_auto_confirmation=globals['is_auto_confirmation'])
-    if not (globals['is_develop_model'] and globals['is_maintain_model_files_in_simulator_when_develop_mode']):
+    if not (globals['is_develop_model'] and globals['is_maintain_files_in_simulator_when_develop_mode']):
         Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
         pass  # if
