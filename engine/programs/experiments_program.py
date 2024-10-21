@@ -63,17 +63,31 @@ def main(globals):
             mtime_of_file_parameters_pkl = Path(globals['folderpath_parameters'], "parameters.pkl").resolve().stat().st_mtime
             mtime_of_file_experimentsWorksStatus_db = Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db").resolve().stat().st_mtime
             if mtime_of_file_parameters_pkl > mtime_of_file_experimentsWorksStatus_db:
-                is_recreate_experiments_works_status_db = True
+                is_mtime_of_file_parameters_pkl_changed = True
             else:
-                is_recreate_experiments_works_status_db = False
+                is_mtime_of_file_parameters_pkl_changed = False
                 pass  # if
         else:
             is_exist_experiments_works_status_db = False
+            is_mtime_of_file_parameters_pkl_changed = True
+            pass  # if
+
+        if globals['is_rerun_all_done_works_in_the_same_experiments'] or is_mtime_of_file_parameters_pkl_changed:
             is_recreate_experiments_works_status_db = True
+            if is_exist_experiments_works_status_db:
+                is_remove_experiments_works_status_db = True
+            else:
+                is_remove_experiments_works_status_db = False
+                pass  # if
+        else:
+            is_recreate_experiments_works_status_db = False
+            is_remove_experiments_works_status_db = False
             pass  # if
-        if is_exist_experiments_works_status_db:
-            os.remove(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
+
+        if is_remove_experiments_works_status_db:
+            os.remove(Path(sgv['folderpath_experiments_output_log'], "experiments_works_status.db"))
             pass  # if
+
         if is_recreate_experiments_works_status_db:  # 创建数据库并初始化表格
             conn = sqlite3.connect(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
             c = conn.cursor()
