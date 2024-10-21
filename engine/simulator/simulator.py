@@ -65,22 +65,26 @@ def simulator(config: dict):
         globals['folderpath_settings'],
         globals['folderpath_parameters'],
         globals['folderpath_agents'],
-    ) = Tools.set_experiments_folders(
-        foldername_experiments_output_data=globals['foldername_experiments_output_data'],
-        foldername_experiments_output=globals['foldername_experiments_output'],
+    ) = (Tools.set_experiments_folders(
+        str_folderpath_config=globals['folderpath_config'],
         str_folderpath_experiments_projects=globals['folderpath_experiments_projects'],
-        str_folderpath_root_experiments_output=globals['folderpath_root_experiments'],
+        str_folderpath_parameters=globals['folderpath_parameters'],
         str_foldername_engine=globals['foldername_engine'],
         str_folderpath_relpath_engine=globals['folderpath_relpath_engine'],
-        str_foldername_outputData=globals['foldername_outputData'],
-        str_folderpath_relpath_outputData=globals['folderpath_relpath_outputData'],
+        str_folderpath_relpath_CIS=globals['folderpath_relpath_CIS'],
         str_folderpath_models=globals['folderpath_models'],
-        str_folderpath_world_environment=globals['folderpath_world_environment'],
-        str_folderpath_world_conception_knowledge=globals['folderpath_world_conception_knowledge'],
-        str_folderpath_config=globals['folderpath_config'],
         str_folderpath_settings=globals['folderpath_settings'],
-        str_folderpath_parameters=globals['folderpath_parameters'],
+        str_folderpath_relpath_ECS=globals['folderpath_relpath_ECS'],
+        str_folderpath_world_conception_knowledge=globals['folderpath_world_conception_knowledge'],
+        str_folderpath_relpath_AWS=globals['folderpath_relpath_AWS'],
+        str_folderpath_world_environment=globals['folderpath_world_environment'],
         str_folderpath_agents=globals['folderpath_agents'],
+        str_folderpath_relpath_LMS=globals['folderpath_relpath_LMS'],
+        str_folderpath_root_experiments_output=globals['folderpath_root_experiments'],
+        str_folderpath_relpath_outputData=globals['folderpath_relpath_outputData'],
+        str_foldername_outputData=globals['foldername_outputData'],
+        foldername_experiments_output=globals['foldername_experiments_output'],
+        foldername_experiments_output_data=globals['foldername_experiments_output_data'])
     )
 
     Tools.flatten_dict(globals, 1)  # 将 globals 字典中的内容扁平化
@@ -163,27 +167,28 @@ def simulator(config: dict):
         # 设置参数
 
         # # 如果参数库当中的参数文件夹中的参数文件有更新，那么就要在后续重新生成参数作业数据
-        if Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.xlsx").resolve().exists():
+        if Path(globals['folderpath_parameters'], r"parameters.xlsx").resolve().exists():
             mtime_of_file_parameters_xlsx = Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.xlsx").resolve().stat().st_mtime
             mtime_of_file_parameters_py = Path(globals['folderpath_project'], globals['folderpath_parameters'], r"parameters.py").resolve().stat().st_mtime
             filepath_parameters_works_pkl = Path(globals['folderpath_experiments_output_parameters'], r"parameters")
             if filepath_parameters_works_pkl.exists():
                 mtime_of_file_parameters_works_pkl = Path(globals['folderpath_experiments_output_parameters'], r"parameters").resolve().stat().st_mtime
                 if (mtime_of_file_parameters_xlsx > mtime_of_file_parameters_works_pkl or mtime_of_file_parameters_py > mtime_of_file_parameters_works_pkl):
-                    is_generate_parameters_works_data = True
-                    logging.info("参数文件有更新，需要重新生成参数作业数据。")
+                    is_mtime_of_file_parameters_pkl_changed = True
+                    logging.info("参数文件有更新。")
                 else:
-                    is_generate_parameters_works_data = False
-                    logging.info("参数文件没有更新，不需要重新生成参数作业数据。")
+                    is_mtime_of_file_parameters_pkl_changed = False
+                    logging.info("参数文件没有更新。")
                     pass  # if
             else:
-                is_generate_parameters_works_data = True
-                logging.info("参数作业数据文件不存在，需要重新生成参数作业数据。")
+                is_exist_experiments_works_status_db = False
+                is_mtime_of_file_parameters_pkl_changed = True
+                logging.info("参数作业数据文件不存在。")
                 pass  # if
             pass  # if
 
         # 运行参数作业程序
-        if is_generate_parameters_works_data:
+        if is_mtime_of_file_parameters_pkl_changed:
             Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(globals['folderpath_parameters'], Path(globals['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=globals['is_auto_confirmation'])
 
