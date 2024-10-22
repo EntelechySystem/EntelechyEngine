@@ -30,7 +30,7 @@ def main(globals):
     #
     # # folderpath_parameters = folderpath
 
-    # %% 预安装模型、数据，运行实验组
+    # %% 预安装系统、数据，运行实验组
 
     # # 设置主进程日志
     # logger = logging.getLogger()
@@ -40,12 +40,12 @@ def main(globals):
     # log_console_handler = logging.StreamHandler()
     # logger.addHandler(log_console_handler)
 
-    # %% 预安装模型、数据，运行实验组
+    # %% 预安装系统、数据，运行实验组
 
     if globals['is_ignore_warning']:
         warnings.filterwarnings("ignore")  # 忽略警告
 
-    # 初始化、构建、安装模型
+    # 初始化、构建、安装系统
 
     # 读取设置文件为字典
     settings = DataManageTools.load_PKLs_to_DataFrames(Path(globals['folderpath_engine'], r"engine/data/Settings"))
@@ -63,17 +63,31 @@ def main(globals):
             mtime_of_file_parameters_pkl = Path(globals['folderpath_parameters'], "parameters.pkl").resolve().stat().st_mtime
             mtime_of_file_experimentsWorksStatus_db = Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db").resolve().stat().st_mtime
             if mtime_of_file_parameters_pkl > mtime_of_file_experimentsWorksStatus_db:
-                is_recreate_experiments_works_status_db = True
+                is_mtime_of_file_parameters_pkl_changed = True
             else:
-                is_recreate_experiments_works_status_db = False
+                is_mtime_of_file_parameters_pkl_changed = False
                 pass  # if
         else:
             is_exist_experiments_works_status_db = False
+            is_mtime_of_file_parameters_pkl_changed = True
+            pass  # if
+
+        if globals['is_rerun_all_done_works_in_the_same_experiments'] or is_mtime_of_file_parameters_pkl_changed:
             is_recreate_experiments_works_status_db = True
+            if is_exist_experiments_works_status_db:
+                is_remove_experiments_works_status_db = True
+            else:
+                is_remove_experiments_works_status_db = False
+                pass  # if
+        else:
+            is_recreate_experiments_works_status_db = False
+            is_remove_experiments_works_status_db = False
             pass  # if
-        if is_exist_experiments_works_status_db:
-            os.remove(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
+
+        if is_remove_experiments_works_status_db:
+            os.remove(Path(sgv['folderpath_experiments_output_log'], "experiments_works_status.db"))
             pass  # if
+
         if is_recreate_experiments_works_status_db:  # 创建数据库并初始化表格
             conn = sqlite3.connect(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
             c = conn.cursor()
@@ -146,27 +160,24 @@ def main(globals):
 
     globals['len_parameters_works'] = num_parameters_works
 
-    # 构建本次实验组所需的所有模型
+    # 导入本次实验所需的系统
 
-    # 如果处于测试状态，那么就不需要复制模型库里的模型到模拟器里了
-    if not (globals['is_develop_mode'] and globals['is_maintain_model_files_in_simulator_when_develop_mode']):
-        # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
-        Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
-        Tools.copy_files_from_other_folders(globals['folderpath_models'], globals['folderpath_experiments_output_models'], is_auto_confirmation=globals['is_auto_confirmation'])
-        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
-        Tools.copy_files_from_other_folders(globals['folderpath_models'], Path(globals['folderpath_engine'], "engine/data/models"), is_auto_confirmation=globals['is_auto_confirmation'])
+
+    if not (globals['is_develop_mode'] and globals['is_maintain_files_in_simulator_when_develop_mode']):
+        # 如果是应用实验状态，则复制系统容到输出文件夹下，另外导出一份到`engine/system`文件夹下
+        Tools.delete_and_recreate_folder(globals['folderpath_experiments_output_system'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_system'], globals['folderpath_experiments_output_system'], is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(globals['folderpath_engine'], "engine/data/system"), is_auto_confirmation=globals['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(globals['folderpath_system'], Path(globals['folderpath_engine'], "engine/data/system"), is_auto_confirmation=globals['is_auto_confirmation'])
     else:
         pass  # if
 
-    # 导入实体数据，生成实体集、内容集并返回
+    # 导入系统集合
     # Builder.build_entities_by_execute(globals)
-    models = Tools.import_modules_from_package(str(Path(globals['folderpath_engine'], r'engine/data/models/content')), r"[Cc]ontent_", globals['folderpath_engine'])
+    systems = Tools.import_modules_from_package(str(Path(globals['folderpath_engine'], r'engine/data/system/content')), r"[Ss]ystem", globals['folderpath_engine'])
 
     # 导出配置数据
     Collector.export_config_data(globals)
-
-    # ## 安装模型
-    # globals, list_idsExp_TASK, parameters_works, models = Operator.operate_installing(globals)
 
     # 运行实验组
     logging.info("\n\n\n实验组开始：\n\n")
@@ -174,7 +185,7 @@ def main(globals):
     globals['experiments_running_time'] = 0  # 初始化实验组运行总时长
     globals['export_data_running_time'] = 0  # 初始化导出数据运行总时长
 
-    model = list(models.values())[0]  # 获取当前实验对应的模型。如果一次批处理只有一个模型，那么就用这个。
+    system = list(systems.values())[0]  # 获取当前实验对应的系统。如果一次批处理只有一个系统，那么就用这个。
 
     # # 连接实验组作业管理数据库
     # conn = sqlite3.connect(Path(globals['folderpath_experiments_output_log'], "experiments_works_status.db"))
@@ -187,7 +198,7 @@ def main(globals):
     if globals['is_enable_multiprocessing']:
         # ## #NOTE：多进程并行处理 #TODO等到后续需要的时候再进行适配
         # # para = para.to_dict()  # 将参数数据框转换为字典
-        # # model = models[f"model_{para['model_name']}"]  # 获取当前实验对应的模型。如果一次批处理不止一个模型，那么就用这个。
+        # # system = systems[f"system_{para['system_name']}"]  # 获取当前实验对应的系统。如果一次批处理不止一个系统，那么就用这个。
         #
         # ## 并行计算时，关闭主进程日志记录器，改由子进程记录各自的日志
         # log_file_handler.close()
@@ -200,7 +211,7 @@ def main(globals):
         # works = []
         # for i, para in parameters_works_TASK.iterrows():
         #     exp_id = int(parameters_works_TASK.loc[i, 'exp_id'])  # 获取当前实验编号
-        #     work = (exp_id, globals, para, model)
+        #     work = (exp_id, globals, para, system)
         #     works.append(work)
         #     pass  # for
         #
@@ -230,12 +241,12 @@ def main(globals):
 
         for i, para in parameters_works_TASK.iterrows():
             para = para.to_dict()  # 将参数数据框转换为字典
-            # model = models[f"model_{para['model_name']}"]  # 获取当前实验对应的模型。如果一次批处理不止一个模型，那么就用这个。
-            model = list(models.values())[0]  # 获取当前实验对应的模型。如果一次批处理只有一个模型，那么就用这个。
+            # system = systems[f"system_{para['system_name']}"]  # 获取当前实验对应的系统。如果一次批处理不止一个系统，那么就用这个。
+            system = list(systems.values())[0]  # 获取当前实验对应的系统。如果一次批处理只有一个系统，那么就用这个。
             globals['id_experiment'] = i + 1  # 设定当前实验编号
 
             # 运行一次实验作业
-            fun_single_experiment_work(globals['id_experiment'], globals, para, model)
+            fun_single_experiment_work(globals['id_experiment'], globals, para, system)
             pass  # for
 
         globals['simulator_end_time'] = timeit.default_timer()  # 记录串行运行模式下，记录模拟器结束运行时刻
@@ -320,7 +331,7 @@ def main(globals):
     pass  # main
 
 
-def fun_single_experiment_work(exp_id: int, globals_original: dict, para, model: dict):
+def fun_single_experiment_work(exp_id: int, globals_original: dict, para, system: dict):
     """
     实验模拟程序。用于运行单个实验。
 
@@ -328,7 +339,7 @@ def fun_single_experiment_work(exp_id: int, globals_original: dict, para, model:
         exp_id (int): 实验编号
         globals (dict): 模拟器全局变量（原始的）
         para (pandas.Series): 实验参数
-        model (dict): 模型
+        system (dict): 系统
 
     Returns:
         None
@@ -336,8 +347,8 @@ def fun_single_experiment_work(exp_id: int, globals_original: dict, para, model:
     globals = deepcopy(globals_original)  # 复制全局变量，保证不同实验的全局变量的独立性
     globals['id_experiment'] = exp_id  # 设定当前实验编号
 
-    # 运行模型
-    model(para, globals)
+    # 运行系统
+    system(para, globals)
 
     pass  # function
 
