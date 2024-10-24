@@ -225,7 +225,7 @@ class Tools:
             folderpath_experiments_output_agents (Path): 实验输出实验个体众数据初始化设置项文件夹路径
         """
 
-        ## 设置项目文件夹路径
+        # 设置项目文件夹路径
         folderpath_project = Tools._get_current_project_rootpath()
         folderpath_engine = Tools.get_project_rootpath(str_foldername_engine, str_folderpath_relpath_engine)
         folderpath_outputData = Tools.get_project_rootpath(str_foldername_outputData, str_folderpath_relpath_outputData)
@@ -270,8 +270,8 @@ class Tools:
         folderpath_experiments_output_agents = Path(folderpath_experiments_output, "agents")
         folderpath_experiments_output_agents.mkdir(parents=True, exist_ok=True)  # 创建文件夹，以导出实验输出实验个体众数据初始化设置
 
-        ## 设定实验相关的一些重要的文件夹
-        folderpath_system = Path(folderpath_project,str_folderpath_system ).resolve()  # 设定系统文件夹
+        # 设定实验相关的一些重要的文件夹
+        folderpath_system = Path(folderpath_project, str_folderpath_system).resolve()  # 设定系统文件夹
         folderpath_config = Path(folderpath_project, str_folderpath_config).resolve()  # 设定实验配置项文件夹
         folderpath_parameters = Path(folderpath_project, str_folderpath_parameters).resolve()  # 设定实验参数项文件夹
         folderpath_models = Path(folderpath_project, str_folderpath_relpath_CIS, str_folderpath_models).resolve()  # 设定模型文件夹
@@ -322,7 +322,7 @@ class Tools:
 
         """
 
-        ## 设定实验结果导出文件夹
+        # 设定实验结果导出文件夹
         if type_of_experiments_foldername == "default":  # 设定前缀字符串
             str_manuallyName = foldername_prefix_experiments
             if is_datetime is True:  # 设定日期时间字符串
@@ -479,7 +479,7 @@ class Tools:
         # str_folderpath = cls._translate_package_form_path_to_folder_form_path(str_package_form_path) # NOTE 仅当如果用到以模块形式的包之路径的时候启用。
         module_form_path_package = cls._translate_folder_form_path_to_package_form_path(str_folderpath, str_folderpath_project)
 
-        ## 遍历以导入内容函数
+        # 遍历以导入内容函数
         idx_file = 0
         list_files = []  # 文件列表
         list_contents = {}  # 内容列表
@@ -552,32 +552,74 @@ class Tools:
             is_auto_confirmation (bool): 是否自动确认操作。默认False。
 
         """
-        # folderpath_project = Tools.get_project_rootpath("engine", foldername_project, folderpath_relpath_project)
+        # folderpath_project = Tools.get_project_rootpath("SystemicRiskSimulator", foldername_project, folderpath_realpath_project)
 
         # if isinstance(folderpath_target, str):
         #     folderpath_target = Path(folderpath_project, folderpath_target)
 
-        confirmation = 'n'
-        # folder_path = folderpath_target
-        if folderpath_target.exists() and folderpath_target.is_dir():
-            if len(list(folderpath_target.glob('*'))) > 0:
-                if is_auto_confirmation == True:
-                    confirmation = 'y'
-                else:
-                    confirmation = input(rf"确认要删除文件夹 {folderpath_target} 及其内容吗？(y/[n]): ")
+        confirmation_01 = 'n'
+        confirmation_02 = 'n'
 
-                if confirmation.lower() == 'y':
-                    shutil.rmtree(folderpath_target)
-                    folderpath_target.mkdir()
-                    print(f"文件夹 {folderpath_target.name} 已成功删除并重新创建！")
-                else:
-                    print("删除重建操作已取消！")
-            else:
-                print(f"文件夹 {folderpath_target.name} 为空，无需删除！")
+        if folderpath_target.exists() and folderpath_target.is_dir():
+            is_exist_folderpath_target = True
         else:
-            print(f"文件夹 {folderpath_target.name} 不存在！直接新建一个文件夹。")
-            folderpath_target.mkdir(parents=True, exist_ok=True)
-        pass  # function
+            is_exist_folderpath_target = False
+            pass  # if
+
+        is_exist_files = None
+        if is_exist_folderpath_target:
+            if len(list(folderpath_target.glob('*'))) > 0:
+                is_exist_files = True
+            else:
+                is_exist_files = False
+                pass  # if
+        else:
+            is_need_delete = False
+            if is_auto_confirmation == True:
+                confirmation_02 = 'y'
+            else:
+                confirmation_02 = input(f"文件夹 {folderpath_target} 不存在！是否创建？(y/[n]): ")
+                pass  # if
+            if confirmation_02.lower() == 'y':
+                is_need_recreate = True
+            else:
+                is_need_recreate = False
+                print("创建操作已取消！")
+                pass  # if
+            pass  # if
+
+        if is_exist_files is True:
+            if is_auto_confirmation == True:
+                confirmation_01 = 'y'
+            else:
+                confirmation_01 = input(rf"确认要删除并且重建文件夹 {folderpath_target} 及其内容吗？(y/[n]): ")
+                pass  # if
+            if confirmation_01.lower() == 'y':
+                is_need_delete = True
+                is_need_recreate = True
+            else:
+                is_need_delete = False
+                is_need_recreate = False
+                print("删除重建操作已取消！")
+                pass  # if
+        elif is_exist_files is False:
+            is_need_delete = False
+            is_need_recreate = False
+            print("文件夹为空，无需删除！")
+        else:
+            pass  # if
+
+        if is_need_delete:
+            shutil.rmtree(folderpath_target)
+            print(f"文件夹 {folderpath_target.name} 已成功删除！")
+            pass  # if
+
+        if is_need_recreate:
+            folderpath_target.mkdir()
+            print(f"文件夹 {folderpath_target.name} 已成功新建！")
+            pass  # if
+
+    pass  # function
 
     @classmethod
     def MinMaxScaler(cls, data: Union[list, np.ndarray], min_max_range: tuple) -> np.ndarray:
