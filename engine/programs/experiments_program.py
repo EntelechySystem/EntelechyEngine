@@ -124,7 +124,6 @@ def main(gb):
                 pass  # if
             pass  # for
 
-        gb['list_idsExperiment_to_run'] = eval(gb['list_idsExperiment_to_run'])  # 将未运行过的实验组 id 列表转换为 JSON 字符串
         list_idsExp_PLAN = gb['list_idsExperiment_to_run'] if len(gb['list_idsExperiment_to_run']) != 0 else list(range(1, num_parameters_works + 1))
         list_idsExp_TASK = [i for i in list_idsExp_PLAN if i not in list_idsExp_DONE]
         # 保存实验组作业完成状态信息

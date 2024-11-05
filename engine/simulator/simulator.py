@@ -192,7 +192,7 @@ def simulator(config: dict):
         # # 如果参数库当中的参数文件夹中的参数文件有更新，那么就要在后续重新生成参数作业数据
         if Path(gb['folderpath_parameters'], r"parameters.xlsx").resolve().exists():
             mtime_of_file_parameters_xlsx = Path(gb['folderpath_project'], gb['folderpath_parameters'], r"parameters.xlsx").resolve().stat().st_mtime
-            mtime_of_file_parameters_py = Path(gb['folderpath_project'], gb['folderpath_parameters'], r"parameters.py").resolve().stat().st_mtime
+            mtime_of_file_parameters_py = Path(gb['folderpath_project'], gb['folderpath_parameters'], r"parameters_program.py").resolve().stat().st_mtime  # #HACK 事实上现在还没有用到
             filepath_parameters_works_pkl = Path(gb['folderpath_experiments_output_parameters'], r"parameters")
             if filepath_parameters_works_pkl.exists():
                 mtime_of_file_parameters_works_pkl = Path(gb['folderpath_experiments_output_parameters'], r"parameters").resolve().stat().st_mtime
