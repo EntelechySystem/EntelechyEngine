@@ -2,7 +2,7 @@
 各种处理数据的工具
 """
 from engine.tools.Tools import Tools
-from engine.externals import re, np, csv, pd, Path, load_workbook, dataclass, ast, builtins
+from engine.externals import re, np, csv, pd, Path, load_workbook, dataclass, ast, builtins, importlib
 
 
 # from engine.Core.Tools.Tools import Tools
@@ -393,13 +393,12 @@ class DataManageTools:
         return dataframes
 
     @classmethod
-    def load_configs_from_excel_to_dict(cls, folderpath_Excel: Path, is_save_to_pyfile=False, filepath_python: Path = None):
+    def load_configs_from_excel_file_then_save_as_python_file(cls, folderpath_Excel: Path, filepath_python: Path = None):
         """
         从 Excel 文件中读取配置项和配置值，然后返回一个字典，根据配置项和配置值生成一个 Python 文件。该文件内容为一个字典，字典变量名为 config ，其中配置项是键，配置值是值。
 
         Args:
             folderpath_Excel (Path): Excel 文件的路径。
-            is_save_to_pyfile (bool): 是否保存为 Python 文件。默认为 False。
             filepath_python (str): 导出的 Python 文件的路径。默认相同于 Excel 路径，文件名为 config_dict.py 。
 
         Returns:
@@ -422,6 +421,8 @@ class DataManageTools:
             keys = df_config['配置项']
             values = df_config['配置值']
             data_types = df_config['数据类型']
+            config_types = df_config['配置类别']
+            notes = df_config['备注']
 
             result_dict = {}  # 创建一个字典，其中配置项是键，配置值是值
 
@@ -446,40 +447,97 @@ class DataManageTools:
                 pass  # for
 
             # 保存为 Python 文件，文件是一个字典 config，其中配置项是键，配置值是值
-            if is_save_to_pyfile:
-                filepath_python = filepath_python if filepath_python else Path(folderpath_Excel, r"config_dict.py")
-                modules = set()
-                with open(filepath_python, 'w') as f:
-                    for key, value, data_type in zip(keys, values, data_types):
-                        if data_type == '代码段':  # 如果数据满足以下条件，就解析代码，找出所有的模块名
-                            tree = ast.parse(value)
-                            for node in ast.walk(tree):
-                                if isinstance(node, ast.Name) and not isinstance(node.ctx, ast.Store) and node.id not in dir(builtins):
-                                    modules.add(node.id)
-                                    pass  # if
-                                pass  # for
-                            pass  # if
-                        pass  # for
-                    pass  # with
-                    # 在文件的开头添加 import 语句
-                    for module in modules:
-                        f.write(f"import {module}\n")
-                        pass  # for
-                    # 写入字典
-                    f.write('\nconfig = dict(\n')
-                    for key, value, data_type in zip(keys, values, data_types):
-                        if data_type == '代码段' or data_type == '布尔值':  # 如果数据类型不满足以下条件，就将值作为字符串处理
-                            f.write(f"    {key}={value},\n")
-                        else:  # 否则，就将值作为字符串处理
-                            f.write(f"    {key}=r'{value}',\n")
-                            pass  # if
-                        pass  # for
-                    f.write(')\n')
-                    pass  # with
-                pass  # if
+            filepath_python = filepath_python if filepath_python else Path(folderpath_Excel, r"config.py")
+            modules = set()
+            with open(filepath_python, 'w') as f:
+                for key, value, data_type in zip(keys, values, data_types):
+                    if data_type == '代码段':  # 如果数据满足以下条件，就解析代码，找出所有的模块名
+                        tree = ast.parse(value)
+                        for node in ast.walk(tree):
+                            if isinstance(node, ast.Name) and not isinstance(node.ctx, ast.Store) and node.id not in dir(builtins):
+                                modules.add(node.id)
+                                pass  # if
+                            pass  # for
+                        pass  # if
+                    pass  # for
+                pass  # with
+                # 在文件的开头添加 import 语句
+                for module in modules:
+                    f.write(f"import {module}\n")
+                    pass  # for
+                # 写入字典
+                f.write('\nconfig = dict(\n')
+                for key, value, data_type, config_type, note in zip(keys, values, data_types, config_types, notes):
+                    if data_type == '代码段' or data_type == '布尔值' or data_type == '整数' or data_type == '浮点数':  # 如果数据类型满足以下条件，就特殊处理，否则作为字符串处理
+                        data_value = value
+                    else:  # 否则，就将值作为字符串处理
+                        data_value = rf"'{value}'"  # #BUG 可能存在转义字符的问题
+                        pass  # if
+                    # 将【配置项】、【配置值】以键值对形式作为代码内容写入文件行，将【数据类型】、【配置类别】、【备注】作为注释写入文件行
+                    f.write(f"    {key}={data_value},  # 数据类型：{data_type}；配置类别：{config_type}；备注：{note} ；\n")
+                    pass  # for
+                f.write(')\n')
+                pass  # with
             pass  # for
 
         return result_dict
         pass  # function
+
+    @classmethod
+    def load_configs_from_python_file_then_save_as_excel_file(cls, filepath_python: Path, filepath_excel: Path = None):
+        """
+        从 Python 文件中读取配置项和配置值，然后返回一个字典，根据配置项和配置值生成一个 Excel 文件。
+
+        Args:
+            filepath_python (Path): Python 文件路径。
+            filepath_excel (Path): 导出的 Excel 文件的路径。默认相同于 Python 路径，文件名为 config.xlsx 。
+
+        Returns:
+            result_dict (dict): 一个字典，其中配置项是键，配置值是值。
+        """
+
+        config_module = importlib.import_module(filepath_python.stem)  # 从路径动态导入一个 Python 文件
+        config_dict = config_module.config  # 从 Python 文件中导入一个字典变量
+        pd.DataFrame(config_dict.items(), columns=['配置项', '配置值']).to_excel(filepath_excel if filepath_excel else filepath_python.with_suffix('.xlsx'), index=False)  # 转换成 Pandas DataFrame
+        with open(filepath_python, 'r') as f:
+            lines = f.readlines()
+
+        # 正则表达式匹配键值对和注释
+        pattern = re.compile(r"\s*(\w+)\s*=\s*(.+),\s*#\s*数据类型：(.*)；配置类别：(.*)；备注：(.*)；")
+        # 创建DataFrame
+        keys = []
+        values = []
+        data_types = []
+        config_types = []
+        notes = []
+        for line in lines:
+            match = pattern.match(line)
+            if match:
+                key, value, data_type, config_type, note = match.groups()
+                keys.append(key)
+                values.append(value)
+                data_types.append(data_type.strip())
+                config_types.append(config_type.strip())
+                notes.append(note.strip())
+                pass  # if
+            pass  # for
+        df_config = pd.DataFrame({
+            '配置项': keys,
+            '配置值': values,
+            '数据类型': data_types,
+            '配置类别': config_types,
+            '备注': notes
+        })
+
+        filepath_excel = Path(filepath_python.parent, 'config_content.xlsx')
+        df_config.to_excel(filepath_excel, index=False)  # 保存为Excel文件
+
+        return config_dict
+        pass  # function
+
+        # # 示例用法
+        # filepath_python = Path('config.py')
+        # filepath_excel = Path('config.xlsx')
+        # DataManageTools.load_configs_from_python_file_then_save_as_excel_file(filepath_python, filepath_excel)
 
     pass  # class

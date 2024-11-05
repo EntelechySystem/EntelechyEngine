@@ -40,6 +40,7 @@ import warnings
 import random
 import ast
 import builtins
+import openpyxl
 # import torch
 # from numba import jit
 # from numba import njit
@@ -47,7 +48,7 @@ import builtins
 # import scipy
 
 ## NOTE 以下是绘图用的。如果不需要，可以注释掉。但是请先不要删除！因为目前开发期间，需要作为参考。后续可以删除。
-# if globals['need_visualization']:
+# if gb['need_visualization']:
 #     import igraph as ig
 #     import matplotlib.pyplot as plt
 #     import drawsvg as dw
