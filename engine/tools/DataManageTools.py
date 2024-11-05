@@ -496,27 +496,20 @@ class DataManageTools:
             result_dict (dict): 一个字典，其中配置项是键，配置值是值。
         """
 
-        # 从路径动态导入一个 Python 文件，用到 Python 的反射功能
-        config_module = importlib.import_module(filepath_python.stem)
-        # 从 Python 文件中导入一个字典变量
-        config_dict = config_module.config
-
-        # 转换成 Pandas DataFrame
-        pd.DataFrame(config_dict.items(), columns=['配置项', '配置值']).to_excel(filepath_excel if filepath_excel else filepath_python.with_suffix('.xlsx'), index=False)
-
+        config_module = importlib.import_module(filepath_python.stem)  # 从路径动态导入一个 Python 文件
+        config_dict = config_module.config  # 从 Python 文件中导入一个字典变量
+        pd.DataFrame(config_dict.items(), columns=['配置项', '配置值']).to_excel(filepath_excel if filepath_excel else filepath_python.with_suffix('.xlsx'), index=False)  # 转换成 Pandas DataFrame
         with open(filepath_python, 'r') as f:
             lines = f.readlines()
 
         # 正则表达式匹配键值对和注释
         pattern = re.compile(r"\s*(\w+)\s*=\s*(.+),\s*#\s*数据类型：(.*)；配置类别：(.*)；备注：(.*)；")
-
         # 创建DataFrame
         keys = []
         values = []
         data_types = []
         config_types = []
         notes = []
-
         for line in lines:
             match = pattern.match(line)
             if match:
@@ -526,7 +519,8 @@ class DataManageTools:
                 data_types.append(data_type.strip())
                 config_types.append(config_type.strip())
                 notes.append(note.strip())
-
+                pass  # if
+            pass  # for
         df_config = pd.DataFrame({
             '配置项': keys,
             '配置值': values,
@@ -535,11 +529,8 @@ class DataManageTools:
             '备注': notes
         })
 
-        # 保存为Excel文件
-        filepath_excel = filepath_excel if filepath_excel else filepath_python.with_suffix('.xlsx')
-        # Excel 文件名加一个自定义后缀
-        filepath_excel = filepath_excel.with_name(filepath_excel.stem + '_content' + filepath_excel.suffix)
-        df_config.to_excel(filepath_excel, index=False)
+        filepath_excel = Path(filepath_python.parent, 'config_content.xlsx')
+        df_config.to_excel(filepath_excel, index=False)  # 保存为Excel文件
 
         return config_dict
         pass  # function
