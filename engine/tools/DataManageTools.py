@@ -393,13 +393,13 @@ class DataManageTools:
         return dataframes
 
     @classmethod
-    def load_configs_from_excel_to_dict(cls, folderpath_Excel: Path, is_save_to_pyfile=False, filepath_python: Path = None):
+    def load_configs_from_excel_file_then_save_as_python_file(cls, folderpath_Excel: Path, is_save_to_pyfile=True, filepath_python: Path = None):
         """
         从 Excel 文件中读取配置项和配置值，然后返回一个字典，根据配置项和配置值生成一个 Python 文件。该文件内容为一个字典，字典变量名为 config ，其中配置项是键，配置值是值。
 
         Args:
             folderpath_Excel (Path): Excel 文件的路径。
-            is_save_to_pyfile (bool): 是否保存为 Python 文件。默认为 False。
+            is_save_to_pyfile (bool): 是否保存为 Python 文件。默认为 True。
             filepath_python (str): 导出的 Python 文件的路径。默认相同于 Excel 路径，文件名为 config_dict.py 。
 
         Returns:
@@ -422,6 +422,8 @@ class DataManageTools:
             keys = df_config['配置项']
             values = df_config['配置值']
             data_types = df_config['数据类型']
+            config_types = df_config['配置类别']
+            notes = df_config['备注']
 
             result_dict = {}  # 创建一个字典，其中配置项是键，配置值是值
 
@@ -447,7 +449,7 @@ class DataManageTools:
 
             # 保存为 Python 文件，文件是一个字典 config，其中配置项是键，配置值是值
             if is_save_to_pyfile:
-                filepath_python = filepath_python if filepath_python else Path(folderpath_Excel, r"config_dict.py")
+                filepath_python = filepath_python if filepath_python else Path(folderpath_Excel, r"config.py")
                 modules = set()
                 with open(filepath_python, 'w') as f:
                     for key, value, data_type in zip(keys, values, data_types):
@@ -467,12 +469,16 @@ class DataManageTools:
                         pass  # for
                     # 写入字典
                     f.write('\nconfig = dict(\n')
-                    for key, value, data_type in zip(keys, values, data_types):
-                        if data_type == '代码段' or data_type == '布尔值':  # 如果数据类型不满足以下条件，就将值作为字符串处理
-                            f.write(f"    {key}={value},\n")
+                    for key, value, data_type, config_type, note in zip(keys, values, data_types, config_types, notes):
+                        if data_type == '代码段' or data_type == '布尔值' or data_type == '整数' or data_type == '浮点数':  # 如果数据类型满足以下条件，就特殊处理，否则作为字符串处理
+                            data_value = value
+                            # f.write(f"    {key}={value},\n")
                         else:  # 否则，就将值作为字符串处理
-                            f.write(f"    {key}=r'{value}',\n")
+                            data_value = rf"'{value}'"  # #BUG 可能存在转义字符的问题
+                            # f.write(f"    {key}=r'{value}',\n")
                             pass  # if
+                        # 将【配置项】、【配置值】以键值对形式作为代码内容写入文件行，将【数据类型】、【配置类别】、【备注】作为注释写入文件行
+                        f.write(f"    {key}={data_value},  # 数据类型：{data_type}，配置类别：{config_type}。{note}\n")
                         pass  # for
                     f.write(')\n')
                     pass  # with
