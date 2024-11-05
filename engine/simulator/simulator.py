@@ -56,6 +56,7 @@ def simulator(config: dict):
         gb['folderpath_world_conception_knowledge'],
         gb['folderpath_world_environment'],
         gb['folderpath_agents'],
+        gb['folderpath_data'],
         gb['folderpath_experiments_output'],
         gb['folderpath_experiments_output_data'],
         gb['folderpath_experiments_output_log'],
@@ -101,8 +102,8 @@ def simulator(config: dict):
         pass  # with
 
     # %% 是否运作预加载相关的实验和库文件程序
-    if gb['program_预加载相关的实验和库文件程序']:  #TODO 暂时还没有开发完成、引入使用。
-        pass # if
+    if gb['program_预加载相关的实验和库文件程序']:  # TODO 暂时还没有开发完成、引入使用。
+        pass  # if
 
     # %% 是否运作模拟程序
     if gb['program_实验组模拟程序']:
