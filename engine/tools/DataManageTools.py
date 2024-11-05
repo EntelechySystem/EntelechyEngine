@@ -2,7 +2,7 @@
 各种处理数据的工具
 """
 from engine.tools.Tools import Tools
-from engine.externals import re, np, csv, pd, Path, load_workbook, dataclass, ast, builtins
+from engine.externals import re, np, csv, pd, Path, load_workbook, dataclass, ast, builtins, importlib
 
 
 # from engine.Core.Tools.Tools import Tools
@@ -470,13 +470,11 @@ class DataManageTools:
                 for key, value, data_type, config_type, note in zip(keys, values, data_types, config_types, notes):
                     if data_type == '代码段' or data_type == '布尔值' or data_type == '整数' or data_type == '浮点数':  # 如果数据类型满足以下条件，就特殊处理，否则作为字符串处理
                         data_value = value
-                        # f.write(f"    {key}={value},\n")
                     else:  # 否则，就将值作为字符串处理
                         data_value = rf"'{value}'"  # #BUG 可能存在转义字符的问题
-                        # f.write(f"    {key}=r'{value}',\n")
                         pass  # if
                     # 将【配置项】、【配置值】以键值对形式作为代码内容写入文件行，将【数据类型】、【配置类别】、【备注】作为注释写入文件行
-                    f.write(f"    {key}={data_value},  # 数据类型：{data_type}，配置类别：{config_type}。{note}\n")
+                    f.write(f"    {key}={data_value},  # 数据类型：{data_type}；配置类别：{config_type}；备注：{note} ；\n")
                     pass  # for
                 f.write(')\n')
                 pass  # with
