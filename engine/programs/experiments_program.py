@@ -48,7 +48,7 @@ def main(gb):
     # 初始化、构建、安装系统
 
     # 读取设置文件为字典
-    settings = DataManageTools.load_PKLs_to_DataFrames(Path(gb['folderpath_engine'], r"engine/data/Settings"))
+    settings = DataManageTools.load_PKLs_to_DataFrames(Path(gb['folderpath_engine'], r"engine/libraries/Settings"))
     gb.update(settings)  # 将 settings 字典中的内容更新到 gb 字典中
 
     # 设置参数作业列表
@@ -163,17 +163,17 @@ def main(gb):
 
 
     if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
-        # 如果是应用实验状态，则复制系统容到输出文件夹下，另外导出一份到`engine/system`文件夹下
+        # 如果是应用实验状态，则复制系统到输出文件夹下，另外导出一份到`engine/system`文件夹下
         Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(gb['folderpath_system'], gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
-        Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/system"), is_auto_confirmation=gb['is_auto_confirmation'])
-        Tools.copy_files_from_other_folders(gb['folderpath_system'], Path(gb['folderpath_engine'], "engine/data/system"), is_auto_confirmation=gb['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/libraries/system"), is_auto_confirmation=gb['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(gb['folderpath_system'], Path(gb['folderpath_engine'], "engine/libraries/system"), is_auto_confirmation=gb['is_auto_confirmation'])
     else:
         pass  # if
 
     # 导入系统集合
     # Builder.build_entities_by_execute(gb)
-    systems = Tools.import_modules_from_package(str(Path(gb['folderpath_engine'], r'engine/data/system/content')), r"[Ss]ystem", gb['folderpath_engine'])
+    systems = Tools.import_modules_from_package(str(Path(gb['folderpath_engine'], r'engine/libraries/system/content')), r"[Ss]ystem", gb['folderpath_engine'])
 
     # 导出配置数据
     Collector.export_config_data(gb)

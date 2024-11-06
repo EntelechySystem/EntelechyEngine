@@ -399,8 +399,8 @@ class Collector:
     #         print("参数作业数据文件不存在，需要重新导出参数作业数据。")
     #         pass  # if
     #     if is_generate_parameters_works_data:
-    #         Tools._delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
-    #         Tools._copy_files_from_other_folders(gb['folderpath_parameters'], Path(gb['folderpath_engine'], "engine/data/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
+    #         Tools._delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/libraries/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
+    #         Tools._copy_files_from_other_folders(gb['folderpath_parameters'], Path(gb['folderpath_engine'], "engine/libraries/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
     #         Tools._copy_files_from_other_folders(gb['folderpath_parameters'], gb['folderpath_experiments_output_parameters'], is_auto_confirmation=gb['is_auto_confirmation'])  # 导出一份到输出文件夹
     #         # shutil.copy(Path(gb['folderpath_parameters'], r"set_parameters_variables.py"), gb['folderpath_experiments_output_parameters'])  # 导出一份生成参数的代码文件到输出文件夹
     #         from engine.core.define.define_parameterVariables import para

@@ -407,7 +407,7 @@ class DataManageTools:
         """
         # df = pd.read_excel(folderpath_Excel)  # 读取 Excel 文件
 
-        list_filepath_Excel = [f for f in folderpath_Excel.glob('*.xlsx') if not f.name.startswith("~$")]
+        list_filepath_Excel = [f for f in folderpath_Excel.glob('config.xlsx') if not f.name.startswith("~$")]
         for filepath_Excel in list_filepath_Excel:
             xls = pd.ExcelFile(filepath_Excel)
             dict_df = {}
