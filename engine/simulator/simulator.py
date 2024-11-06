@@ -121,7 +121,7 @@ def simulator(config: dict):
         Tools.copy_files_from_other_folders(gb['folderpath_config'], Path(gb['folderpath_engine'], "engine/libraries/config"), is_auto_confirmation=gb['is_auto_confirmation'])
 
         # 导入智能模型（模型）
-        if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+        if (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
             # 导入相关设置项
             Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(gb['folderpath_settings'], gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
