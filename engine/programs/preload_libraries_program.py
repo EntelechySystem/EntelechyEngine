@@ -6,7 +6,7 @@ from engine.externals import warnings, logging, platform, deepcopy, os, Path, ti
 
 def main(gb):
     """
-    预加载相关的实验和库文件程序。从各个工程项目预加载相关的功能库文件到引擎当中，用于后续开发、实验、运行等工作。  #TODO 暂时还没有开发完成、引入使用。
+    预加载相关的实验和库文件程序。从各个工程项目预加载相关的功能库文件到引擎当中，用于后续开发、实验、运行等工作。
     """
     # # %% 设置工作目录。 #FIXME #TODO
     # # folderpath_settings=Tools.setup_working_directory()
