@@ -29,13 +29,24 @@ def simulator(config: dict):
     config['folderpath_engine'] = Tools.get_project_rootpath(config['foldername_engine'], config['folderpath_relpath_engine'])
 
     # %% 运行配置程序
-    if not config['is_prerun_config_program']:
-        # Tools.run_python_program_file(Path(config['folderpath_engine'], r"engine/data/Config/config.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
-        result = Tools.run_python_program_file(Path(config['folderpath_project'], config['folderpath_config'], r"config.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
+    if config['is_prerun_config_program']:
+        result = Tools.run_python_program_file(Path(config['folderpath_project'], config['folderpath_config'], r"config_program.py").resolve(), [Path(config['folderpath_engine'], r"engine/data/Config").resolve()])
 
     # 读取配置文件为字典
-    with open(Path(config['folderpath_project'], config['folderpath_config'], r"config.pkl").resolve(), 'rb') as f:
-        config = pickle.load(f)
+    if config['is_prerun_config_program'] or config['is_use_xlsx_as_config_file']:
+        is_load_config_from_pickle_file = True
+        is_load_config_from_python_file = False
+    else:
+        is_load_config_from_pickle_file = False
+        is_load_config_from_python_file = True
+        pass  # if
+
+    if is_load_config_from_pickle_file:
+        with open(Path(config['folderpath_project'], config['folderpath_config'], r"config.pkl").resolve(), 'rb') as f:
+            config = pickle.load(f)
+
+    if is_load_config_from_python_file:
+        config = (Tools.import_modules_from_package(str(Path(config['folderpath_project'], config['folderpath_config'])), r'config', config['folderpath_project']))['config']
 
     # config 赋值给全局变量 gb
     gb.update(config)
@@ -102,7 +113,63 @@ def simulator(config: dict):
         pass  # with
 
     # %% 是否运作预加载相关的实验和库文件程序
-    if gb['program_预加载相关的实验和库文件程序']:  # TODO 暂时还没有开发完成、引入使用。
+    if gb['program_预加载相关的实验和库文件程序']:
+        # 导入相关配置项
+        Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_config'], is_auto_confirmation=gb['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(gb['folderpath_config'], gb['folderpath_experiments_output_config'], is_auto_confirmation=gb['is_auto_confirmation'])
+        Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/config"), is_auto_confirmation=config['is_auto_confirmation'])
+        Tools.copy_files_from_other_folders(gb['folderpath_config'], Path(gb['folderpath_engine'], "engine/data/config"), is_auto_confirmation=gb['is_auto_confirmation'])
+
+        # 导入智能模型（模型）
+        if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+            # 导入相关设置项
+            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_settings'], gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/settings").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_settings'], Path(gb['folderpath_engine'], "engine/data/settings").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+
+            # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
+            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_models'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_models'], gb['folderpath_experiments_output_models'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/models"), is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_models'], Path(gb['folderpath_engine'], "engine/data/models"), is_auto_confirmation=gb['is_auto_confirmation'])
+
+            # 导入相关个体众数据库
+            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_agents'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_agents'], gb['folderpath_experiments_output_agents'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/agents").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_agents'], Path(gb['folderpath_engine'], "engine/data/agents").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+
+            # 导入相关世界环境模型
+            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_world_environment'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_world_environment'], gb['folderpath_experiments_output_world_environment'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/world_environment").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_world_environment'], Path(gb['folderpath_engine'], "engine/data/world_environment").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+
+            # 导入相关世界概念知识模型
+            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_world_conception_knowledge'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_world_conception_knowledge'], gb['folderpath_experiments_output_world_conception_knowledge'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/world_conception_knowledge").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_world_conception_knowledge'], Path(gb['folderpath_engine'], "engine/data/world_conception_knowledge").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
+
+        else:
+            pass  # if
+
+        ## 运行预加载相关的实验和库文件程序。
+        if not gb['is_develop_mode']:
+            globals_pkl = pickle.dumps(gb)
+            globals_base64 = base64.b64encode(globals_pkl).decode('utf-8')
+            # para_pkl = pickle.dumps(para)
+            # para_base64 = base64.b64encode(para_pkl).decode('utf-8')
+            start_time = time.time()
+            subprocess.run(["python", str(Path(gb['folderpath_agents'], 'engine/programs/preload_libraries_program.py')), globals_base64])
+            # subprocess.run(["python", str(Path(gb['folderpath_agents'], 'engine/programs/preload_libraries_program.py')), globals_base64, para_base64])
+        else:
+            from engine.programs.preload_libraries_program import main
+            start_time = time.time()
+            main(gb)
+            pass  # if
+
         pass  # if
 
     # %% 是否运作模拟程序
@@ -113,8 +180,14 @@ def simulator(config: dict):
         Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/config"), is_auto_confirmation=config['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(gb['folderpath_config'], Path(gb['folderpath_engine'], "engine/data/config"), is_auto_confirmation=gb['is_auto_confirmation'])
 
-        # 导入智能模型（模型）
+        # 导入相关文件到实验台
         if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+            # 导入相关系统项
+            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_system'], gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/system"), is_auto_confirmation=gb['is_auto_confirmation'])
+            Tools.copy_files_from_other_folders(gb['folderpath_system'], Path(gb['folderpath_engine'], "engine/data/system"), is_auto_confirmation=gb['is_auto_confirmation'])
+
             # 导入相关设置项
             Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(gb['folderpath_settings'], gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
@@ -319,6 +392,6 @@ def simulator(config: dict):
     Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
     Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/agents"), is_auto_confirmation=gb['is_auto_confirmation'])
     Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/settings"), is_auto_confirmation=gb['is_auto_confirmation'])
-    if not (gb['is_develop_model'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+    if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
         Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/data/models"), is_auto_confirmation=gb['is_auto_confirmation'])
         pass  # if

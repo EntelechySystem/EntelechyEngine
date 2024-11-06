@@ -163,7 +163,7 @@ def main(gb):
 
 
     if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
-        # 如果是应用实验状态，则复制系统容到输出文件夹下，另外导出一份到`engine/system`文件夹下
+        # 如果是应用实验状态，则复制系统到输出文件夹下，另外导出一份到`engine/system`文件夹下
         Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
         Tools.copy_files_from_other_folders(gb['folderpath_system'], gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
         Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/data/system"), is_auto_confirmation=gb['is_auto_confirmation'])
