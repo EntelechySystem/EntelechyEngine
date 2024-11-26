@@ -799,6 +799,47 @@ class Tools:
             list_args.append(args)
         return list_args
 
+    def encode_unicode_to_array(unicode_string: str) -> np.ndarray:
+        """编码 Unicode 字符串为 Unicode 整数数组。"""
+        return np.array([ord(char) for char in unicode_string], dtype=np.uint32)
+        pass  # function
+
+    def decode_unicode_array_to_string(unicode_array: np.ndarray) -> str:
+        """解码 Unicode 整数数组为字符串。"""
+        byte_array = (unicode_array % 0x10FFFF).astype(np.uint32).tobytes()
+        return byte_array.decode('utf-32', errors='ignore')
+        pass  # function
+
+    def process_string_to_fix_length(input_string, target_length=256, pad_char=' ', truncate_marker='...'):
+        """
+        处理字符串，截断或补全到指定长度。
+
+        Args:
+            input_string (str): 输入字符串
+            target_length (int): 目标长度
+            pad_char (str): 补全字符
+            truncate_marker (str): 截断标记
+
+        Returns:
+            str: 处理后的字符串
+            info: 处理信息
+        """
+        info = ""
+        if len(input_string) > target_length:
+            # 截断字符串并添加截断标记
+            truncated_string = input_string[:target_length - len(truncate_marker)] + truncate_marker
+            info = f"字符串长度超过 {target_length}，已截断。"
+            return truncated_string, info
+        elif len(input_string) < target_length:
+            # 补全字符串
+            padded_string = input_string + pad_char * (target_length - len(input_string))
+            info = f"字符串长度不足 {target_length}，已补全。"
+            return padded_string, info
+        else:
+            return input_string, info
+            pass  # if
+        pass  # function
+
     @classmethod
     def flatten_dict(cls, d, depth, parent_key='', sep='_', current_depth=1):
         """
