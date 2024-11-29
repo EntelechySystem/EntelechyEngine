@@ -7,19 +7,19 @@ import torch
 import numpy as np
 # from numba import njit
 
-from ComplexIntelligenceSystem_python.Core.tools import Tools
-from ComplexIntelligenceSystem_python.Core.settings import Settings
+from engine.functions.ComplexIntelligenceSystem.Core.tools import Tools
+from engine.functions.ComplexIntelligenceSystem.Core.settings import Settings
 
 
 class InitUnits():
     """
-    定义全局单元众 #TODO 未开发，暂时不使用
+    定义全局单元众 #HACK 未开发，暂时不使用
     """
 
     @classmethod
-    def __init__(cls, init_dict, n_units: int, max_num_links: int, unit_type: int):
+    def __init__(cls, init_dict, N_units: int, max_num_links: int, unit_type: int):
         guid = 0
-        while guid < n_units:
+        while guid < N_units:
             pass  # while
         pass  # function
 
@@ -46,18 +46,18 @@ class NeuronsUnits():
     # nodes_obj: torch.Tensor  # 单元之节点
     links: torch.Tensor  # 单元之连接
 
-    def __init__(self, n_units: int, max_num_links: int):
-        self.gid = torch.arange(n_units, dtype=torch.int64)
-        self.uid = torch.arange(n_units, dtype=torch.int64)
-        self.pos_x = torch.zeros(n_units, dtype=torch.float64)
-        self.pos_y = torch.zeros(n_units, dtype=torch.float64)
-        # self.pos_z = torch.zeros(n_units, dtype=torch.float64)
-        self.input_units = torch.empty((n_units), dtype=torch.float32)
-        self.output_units = torch.empty((n_units), dtype=torch.float32)
-        # self.contents_obj = torch.empty((n_units), dtype=torch.string)
-        # self.containers_obj = torch.empty((n_units), dtype=torch.string)
-        # self.nodes_obj = torch.empty((n_units), dtype=torch.string)
-        self.links = torch.empty((n_units, max_num_links), dtype=torch.int32)
+    def __init__(self, N_units: int, max_N_links: int):
+        self.gid = torch.arange(N_units, dtype=torch.int64)
+        self.uid = torch.arange(N_units, dtype=torch.int64)
+        self.pos_x = torch.zeros(N_units, dtype=torch.float64)
+        self.pos_y = torch.zeros(N_units, dtype=torch.float64)
+        # self.pos_z = torch.zeros(N_units, dtype=torch.float64)
+        self.input_units = torch.empty((N_units), dtype=torch.float32)
+        self.output_units = torch.empty((N_units), dtype=torch.float32)
+        # self.contents_obj = torch.empty((N_units), dtype=torch.string)
+        # self.containers_obj = torch.empty((N_units), dtype=torch.string)
+        # self.nodes_obj = torch.empty((N_units), dtype=torch.string)
+        self.links = torch.empty((N_units, max_N_links), dtype=torch.int32)
         pass  # function
 
     pass  # class
@@ -74,11 +74,18 @@ class NeuronsUnits_ForHumanRead():
     # units_type: np.dtype['S32']  # 单元之类型（N）
     units_type: torch.uint8  # 单元之类型（N）
 
-    def __init__(self, n_units: int, max_num_links: int):
-        self.gid = torch.arange(n_units, dtype=torch.int64)
-        # self.uid = torch.arange(n_units, dtype=torch.uint64)
-        self.units_name = np.array([Tools.generate_unique_identifier() for i in range(n_units)], np.dtype('S32'))
-        self.units_type = torch.from_numpy(np.full(n_units, Settings.dict_written_type_of_Units['neuron']))
+    def __init__(self, N_units: int, max_num_links: int):
+        """
+        初始化可人类观察的神经单元之结构化数组的数据类型
+
+        Args:
+            N_units:
+            max_num_links:
+        """
+        self.gid = torch.arange(N_units, dtype=torch.int64)
+        # self.uid = torch.arange(N_units, dtype=torch.uint64)
+        self.units_name = np.array([Tools.generate_unique_identifier() for i in range(N_units)], np.dtype('S32'))
+        self.units_type = torch.from_numpy(np.full(N_units, Settings.dict_written_type_of_Units['neuron']))
         pass  # function
 
     pass  # class
@@ -97,13 +104,13 @@ class NeuronsUnits_ForHumanRead():
 #     output_units: torch.Tensor  # 运作单元之输出
 #     links: torch.Tensor  # 运作单元之连接（N×M）
 #
-#     def __init__(self, n_units: torch.int64, max_num_links: torch.int32, unit_type: torch.uint8):
-#         self.uid = torch.arange(n_units, dtype=torch.int64)
-#         self.units_name = torch.from_numpy(np.array([Tools.generate_unique_identifier() for i in range(n_units)]))
+#     def __init__(self, N_units: torch.int64, max_N_links: torch.int32, unit_type: torch.uint8):
+#         self.uid = torch.arange(N_units, dtype=torch.int64)
+#         self.units_name = torch.from_numpy(np.array([Tools.generate_unique_identifier() for i in range(N_units)]))
 #         self.units_type = torch.from_numpy(np.array(Tools.encode_string_array(unit_type)))
-#         self.input_units = torch.empty((n_units), dtype=torch.float32)
-#         self.output_units = torch.empty((n_units), dtype=torch.float32)
-#         self.links = torch.ones((n_units, max_num_links), dtype=torch.int32) * -1
+#         self.input_units = torch.empty((N_units), dtype=torch.float32)
+#         self.output_units = torch.empty((N_units), dtype=torch.float32)
+#         self.links = torch.ones((N_units, max_N_links), dtype=torch.int32) * -1
 #         pass  # function
 #
 #     pass  # class
@@ -117,30 +124,32 @@ class OperationUnits():
     注意，连接的数据类型为 int32，因为连接的值可能为负数。值为 -1 表示未连接。
     """
 
-    def __init__(self, n_units: np.uint32, max_num_links: np.uint32, unit_type: np.uint8):
-        self.gid = np.arange(n_units)  # 单元之全局 ID
-        self.uid = np.arange(n_units)  # 单元之 ID
-        self.uid_name = np.array([Tools.generate_unique_identifier() for i in range(n_units)])  # 运作单元之名称
-        self.units_type = np.full(n_units, unit_type)  # 运作单元之类型
-        self.input_units = np.full(n_units, ' ', np.dtype('S128'))  # 运作单元之输入
-        self.output_units = np.full(n_units, ' ', np.dtype('S128'))  # 运作单元之输出
-        self.links_softs = -np.ones((n_units, max_num_links), np.dtype(np.int32))  # 运作单元之软连接（N×M）
-        self.links_id = -np.ones((n_units, max_num_links), np.dtype(np.int32))  # 运作单元之 id 硬连接（N×M）
+    def __init__(self, N_units: np.uint32, max_N_links: np.uint32, unit_type: np.uint8, init_gid: np.uint32):
+        self.gid = np.arange(N_units)  # 单元之全局 ID  # 暂时还没用到
+        self.uid = np.arange(N_units)  # 单元之 ID
+        self.uid_name = np.array([Tools.generate_unique_identifier() for i in range(N_units)])  # 运作单元之名称
+        self.units_type = np.full(N_units, unit_type)  # 运作单元之类型
+        self.input_units = np.full(N_units, ' ', np.dtype('S128'))  # 运作单元之输入
+        self.output_units = np.full(N_units, ' ', np.dtype('S128'))  # 运作单元之输出
+        self.links_softs = -np.ones((N_units, max_N_links), np.dtype(np.int32))  # 运作单元之软连接（N×M）
+        self.links_id = -np.ones((N_units, max_N_links), np.dtype(np.int32))  # 运作单元之 id 硬连接（N×M）
+        self.state_on = np.full(N_units, False)  # 运作单元在物理层面上是否被启用，True 表示启用，False 表示未启用
+
         pass  # function
 
 
 @dataclass()
 class OperationUnitsForHuman():
     """
-    定义专门用于人类观察可读的运作单元（机器件）之结构化数组的数据（Numpy 版本）
+    定义可用于人类观察可读的运作单元（机器件）之结构化数组的数据（Numpy 版本）
 
     注意，连接的数据类型为 int32，因为连接的值可能为负数。值为 -1 表示未连接。
     """
 
-    def __init__(self, n_units: np.uint32, max_num_links: np.uint32, unit_type: np.uint8):
-        self.gid = np.arange(n_units)
-        self.explaination = np.full(n_units, ' ', np.dtype('S128'))  # 运作单元之解释
-        self.notes = np.full(n_units, ' ', np.dtype('S4096'))  # 运作单元之备注
+    def __init__(self, N_units: np.uint32, max_N_links: np.uint32, unit_type: np.uint8, init_gid: np.uint32):
+        self.gid = np.arange(init_gid, init_gid + N_units)  # 单元之全局 ID
+        self.explaination = np.full(N_units, ' ', np.dtype('S128'))  # 运作单元之解释
+        self.notes = np.full(N_units, ' ', np.dtype('S4096'))  # 运作单元之备注
         pass  # function
 
     pass  # class

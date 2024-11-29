@@ -27,7 +27,7 @@ class Settings():
         'neuron': 9,  # 神经元类型
     }
 
-    # 用于让人类读取的，解码的单元类型字典（键是编号标记值，值是文本标记值）
+    # 用于让人类读取的，解码的单元类型字典（键是编号标记值，值是文本标记值）。注意，该字典与 dict_written_type_of_Units 是反向的。
     dict_decode_type_of_Units_reverse = {v: k for k, v in dict_written_type_of_Units.items()}
 
     pass  # class
