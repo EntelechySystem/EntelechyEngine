@@ -125,7 +125,7 @@ class OperationUnits():
     """
 
     def __init__(self, N_units: np.uint32, max_N_links: np.uint32, unit_type: np.uint8, init_gid: np.uint32):
-        self.gid = np.arange(N_units)  # 单元之全局 ID  # 暂时还没用到
+        self.gid = np.arange(init_gid, init_gid + N_units)  # 单元之全局 ID
         self.uid = np.arange(N_units)  # 单元之 ID
         self.uid_name = np.array([Tools.generate_unique_identifier() for i in range(N_units)])  # 运作单元之名称
         self.units_type = np.full(N_units, unit_type)  # 运作单元之类型
