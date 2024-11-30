@@ -127,13 +127,14 @@ class OperationUnits():
     def __init__(self, N_units: np.uint32, max_N_links: np.uint32, unit_type: np.uint8, init_gid: np.uint32):
         self.gid = np.arange(init_gid, init_gid + N_units)  # 单元之全局 ID
         self.uid = np.arange(N_units)  # 单元之 ID
+        self.state_on = np.full(N_units, False)  # 运作单元在物理层面上是否被启用，True 表示启用，False 表示未启用
         self.uid_name = np.array([Tools.generate_unique_identifier() for i in range(N_units)])  # 运作单元之名称
         self.units_type = np.full(N_units, unit_type)  # 运作单元之类型
         self.input_units = np.full(N_units, ' ', np.dtype('S128'))  # 运作单元之输入
         self.output_units = np.full(N_units, ' ', np.dtype('S128'))  # 运作单元之输出
         self.links_softs = -np.ones((N_units, max_N_links), np.dtype(np.int32))  # 运作单元之软连接（N×M）
         self.links_id = -np.ones((N_units, max_N_links), np.dtype(np.int32))  # 运作单元之 id 硬连接（N×M）
-        self.state_on = np.full(N_units, False)  # 运作单元在物理层面上是否被启用，True 表示启用，False 表示未启用
+        self.content = np.full(N_units, ' ', np.dtype('S128'))  # 运作单元之内容
 
         pass  # function
 
