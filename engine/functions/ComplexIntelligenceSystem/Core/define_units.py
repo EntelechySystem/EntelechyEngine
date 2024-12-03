@@ -3,7 +3,6 @@
 """
 from dataclasses import dataclass
 
-import torch
 import numpy as np
 # from numba import njit
 
@@ -11,25 +10,28 @@ from engine.functions.ComplexIntelligenceSystem.Core.tools import Tools
 from engine.functions.ComplexIntelligenceSystem.Core.settings import Settings
 
 
-class InitUnits():
-    """
-    定义全局单元众 #HACK 未开发，暂时不使用
-    """
+# class InitUnits():
+#     """
+#     定义全局单元众 #HACK 未开发，暂时不使用
+#     """
+#
+#     @classmethod
+#     def __init__(cls, init_dict, N_units: int, max_num_links: int, unit_type: int):
+#         guid = 0
+#         while guid < N_units:
+#             pass  # while
+#         pass  # function
+#
+#     pass  # class
 
-    @classmethod
-    def __init__(cls, init_dict, N_units: int, max_num_links: int, unit_type: int):
-        guid = 0
-        while guid < N_units:
-            pass  # while
-        pass  # function
 
-    pass  # class
 
+import torch
 
 @dataclass
 class NeuronsUnits():
     """
-    定义神经单元之结构化数组的数据类型
+    定义神经单元之结构化数组的数据类型。基于 PyTorch 的版本
     """
 
     gid: torch.Tensor  # 单元之全局 ID（N）
@@ -66,7 +68,7 @@ class NeuronsUnits():
 @dataclass
 class NeuronsUnits_ForHumanRead():
     """
-    定义专门用于人类观察可读的神经单元之结构化数组的数据类型
+    定义专门用于人类观察可读的神经单元之结构化数组的数据类型。基于 PyTorch 的版本
     """
 
     gid: torch.Tensor  # 单元之全局 ID（N）
@@ -89,6 +91,73 @@ class NeuronsUnits_ForHumanRead():
         pass  # function
 
     pass  # class
+
+
+# import jax.numpy as jnp
+#
+# @dataclass
+# class NeuronsUnits():
+#     """
+#     定义神经单元之结构化数组的数据类型。基于 JAX 的版本
+#     """
+#
+#     gid: jnp.ndarray  # 单元之全局 ID（N）
+#     uid: jnp.ndarray  # 单元之 ID（N）
+#     units_name: jnp.ndarray  # 单元之名称（N×K）
+#     units_type: jnp.ndarray  # 单元之类型（N）
+#     pos_x: jnp.ndarray  # 单元之物理空间之 X 坐标
+#     pos_y: jnp.ndarray  # 单元之物理空间之 Y 坐标
+#     # pos_z: jnp.ndarray  # 单元之物理空间之 Z 坐标 #NOTE 如果需要启用再用
+#     input_units: jnp.ndarray  # 单元之输入
+#     output_units: jnp.ndarray  # 单元之输出
+#     # contents_obj: jnp.ndarray  # 单元之内容
+#     # containers_obj: jnp.ndarray  # 单元之容器
+#     # nodes_obj: jnp.ndarray  # 单元之节点
+#     links: jnp.ndarray  # 单元之连接
+#
+#     def __init__(self, N_units: int, max_N_links: int):
+#         self.gid = jnp.arange(N_units, dtype=jnp.int64)
+#         self.uid = jnp.arange(N_units, dtype=jnp.int64)
+#         self.pos_x = jnp.zeros(N_units, dtype=jnp.float64)
+#         self.pos_y = jnp.zeros(N_units, dtype=jnp.float64)
+#         # self.pos_z = jnp.zeros(N_units, dtype=jnp.float64)
+#         self.input_units = jnp.empty((N_units), dtype=jnp.float32)
+#         self.output_units = jnp.empty((N_units), dtype=jnp.float32)
+#         # self.contents_obj = jnp.empty((N_units), dtype=jnp.string)
+#         # self.containers_obj = jnp.empty((N_units), dtype=jnp.string)
+#         # self.nodes_obj = jnp.empty((N_units), dtype=jnp.string)
+#         self.links = jnp.empty((N_units, max_N_links), dtype=jnp.int32)
+#         pass  # function
+#
+#     pass  # class
+#
+#
+# @dataclass
+# class NeuronsUnits_ForHumanRead():
+#     """
+#     定义专门用于人类观察可读的神经单元之结构化数组的数据类型。基于 JAX 的版本
+#     """
+#
+#     gid: jnp.ndarray  # 单元之全局 ID（N）
+#     # uid: jnp.uint64  # 单元之 ID（N）
+#     # units_type: np.dtype['S32']  # 单元之类型（N）
+#     units_type: jnp.uint8  # 单元之类型（N）
+#
+#     def __init__(self, N_units: int, max_num_links: int):
+#         """
+#         初始化可人类观察的神经单元之结构化数组的数据类型
+#
+#         Args:
+#             N_units:
+#             max_num_links:
+#         """
+#         self.gid = jnp.arange(N_units, dtype=jnp.int64)
+#         # self.uid = jnp.arange(N_units, dtype=jnp.uint64)
+#         self.units_name = np.array([Tools.generate_unique_identifier() for i in range(N_units)], np.dtype('S32'))
+#         self.units_type = jnp.array(np.full(N_units, Settings.dict_written_type_of_Units['neuron']), dtype=jnp.uint8)
+#         pass  # function
+#
+#     pass  # class
 
 
 # @dataclass()
