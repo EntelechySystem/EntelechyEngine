@@ -158,15 +158,15 @@ class Tools:
             str_folderpath_parameters: str,
             str_foldername_engine: str,
             str_folderpath_relpath_engine: str,
-            str_folderpath_relpath_CIS: str,
+            # str_folderpath_relpath_CIS: str,
             str_folderpath_models: str,
             str_folderpath_settings: str,
-            str_folderpath_relpath_ECS: str,
+            # str_folderpath_relpath_ECS: str,
             str_folderpath_world_conception_knowledge: str,
-            str_folderpath_relpath_AWS: str,
+            # str_folderpath_relpath_AWS: str,
             str_folderpath_world_environment: str,
             str_folderpath_agents: str,
-            str_folderpath_relpath_LMS: str,
+            # str_folderpath_relpath_LMS: str,
             str_folderpath_root_experiments_output: str,
             str_folderpath_relpath_outputData: str,
             str_foldername_outputData: str,
@@ -275,11 +275,16 @@ class Tools:
         folderpath_system = Path(folderpath_project, str_folderpath_system).resolve()  # 设定系统文件夹
         folderpath_config = Path(folderpath_project, str_folderpath_config).resolve()  # 设定实验配置项文件夹
         folderpath_parameters = Path(folderpath_project, str_folderpath_parameters).resolve()  # 设定实验参数项文件夹
-        folderpath_models = Path(folderpath_project, str_folderpath_relpath_CIS, str_folderpath_models).resolve()  # 设定模型文件夹
-        folderpath_settings = Path(folderpath_project, str_folderpath_relpath_CIS, str_folderpath_settings).resolve()  # 设定实验设置项文件夹
-        folderpath_world_environment = Path(folderpath_project, str_folderpath_relpath_AWS, str_folderpath_world_environment).resolve()  # 设定模型文件夹
-        folderpath_agents = Path(folderpath_project, str_folderpath_relpath_AWS, str_folderpath_agents).resolve()  # 设定实验实验个体众数据初始化设置项文件夹
-        folderpath_world_conception_knowledge = Path(folderpath_project, str_folderpath_relpath_ECS, str_folderpath_world_conception_knowledge).resolve()  # 设定模型文件夹
+        # folderpath_models = Path(folderpath_project, str_folderpath_relpath_CIS, str_folderpath_models).resolve()  # 设定模型文件夹
+        folderpath_models = Path(folderpath_project, str_folderpath_models).resolve()  # 设定模型文件夹
+        # folderpath_settings = Path(folderpath_project, str_folderpath_relpath_CIS, str_folderpath_settings).resolve()  # 设定实验设置项文件夹
+        folderpath_settings = Path(folderpath_project, str_folderpath_settings).resolve()  # 设定实验设置项文件夹
+        # folderpath_world_environment = Path(folderpath_project, str_folderpath_relpath_AWS, str_folderpath_world_environment).resolve()  # 设定模型文件夹
+        folderpath_world_environment = Path(folderpath_project, str_folderpath_world_environment).resolve()  # 设定模型文件夹
+        # folderpath_agents = Path(folderpath_project, str_folderpath_relpath_AWS, str_folderpath_agents).resolve()  # 设定实验实验个体众数据初始化设置项文件夹
+        folderpath_agents = Path(folderpath_project, str_folderpath_agents).resolve()  # 设定实验实验个体众数据初始化设置项文件夹
+        # folderpath_world_conception_knowledge = Path(folderpath_project, str_folderpath_relpath_ECS, str_folderpath_world_conception_knowledge).resolve()  # 设定模型文件夹
+        folderpath_world_conception_knowledge = Path(folderpath_project, str_folderpath_world_conception_knowledge).resolve()  # 设定模型文件夹
         folderpath_data = Path(folderpath_project, str_folderpath_relpath_outputData, str_foldername_outputData).resolve()  # 设定输出数据文件夹
 
         return (

@@ -86,15 +86,15 @@ def simulator(config: dict):
         str_folderpath_parameters=gb['folderpath_parameters'],
         str_foldername_engine=gb['foldername_engine'],
         str_folderpath_relpath_engine=gb['folderpath_relpath_engine'],
-        str_folderpath_relpath_CIS=gb['folderpath_relpath_CIS'],
+        # str_folderpath_relpath_CIS=gb['folderpath_relpath_CIS'],
         str_folderpath_models=gb['folderpath_models'],
         str_folderpath_settings=gb['folderpath_settings'],
-        str_folderpath_relpath_ECS=gb['folderpath_relpath_ECS'],
+        # str_folderpath_relpath_ECS=gb['folderpath_relpath_ECS'],
         str_folderpath_world_conception_knowledge=gb['folderpath_world_conception_knowledge'],
-        str_folderpath_relpath_AWS=gb['folderpath_relpath_AWS'],
+        # str_folderpath_relpath_AWS=gb['folderpath_relpath_AWS'],
         str_folderpath_world_environment=gb['folderpath_world_environment'],
         str_folderpath_agents=gb['folderpath_agents'],
-        str_folderpath_relpath_LMS=gb['folderpath_relpath_LMS'],
+        # str_folderpath_relpath_LMS=gb['folderpath_relpath_LMS'],
         str_folderpath_root_experiments_output=gb['folderpath_root_experiments'],
         str_folderpath_relpath_outputData=gb['folderpath_relpath_outputData'],
         str_foldername_outputData=gb['foldername_outputData'],
@@ -121,7 +121,7 @@ def simulator(config: dict):
         Tools.copy_files_from_other_folders(gb['folderpath_config'], Path(gb['folderpath_engine'], "engine/libraries/config"), is_auto_confirmation=gb['is_auto_confirmation'])
 
         # 导入智能模型（模型）
-        if (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+        if (gb['is_develop_mode'] and not gb['is_maintain_files_in_simulator_when_develop_mode']):
             # 导入相关设置项
             Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(gb['folderpath_settings'], gb['folderpath_experiments_output_settings'], is_auto_confirmation=gb['is_auto_confirmation'])
@@ -181,7 +181,7 @@ def simulator(config: dict):
         Tools.copy_files_from_other_folders(gb['folderpath_config'], Path(gb['folderpath_engine'], "engine/libraries/config"), is_auto_confirmation=gb['is_auto_confirmation'])
 
         # 导入相关文件到实验台
-        if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+        if not (gb['is_develop_mode'] ):
             # 导入相关系统项
             Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(gb['folderpath_system'], gb['folderpath_experiments_output_system'], is_auto_confirmation=gb['is_auto_confirmation'])
@@ -194,11 +194,12 @@ def simulator(config: dict):
             Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/settings").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
             Tools.copy_files_from_other_folders(gb['folderpath_settings'], Path(gb['folderpath_engine'], "engine/libraries/settings").resolve(), is_auto_confirmation=gb['is_auto_confirmation'])
 
-            # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
-            Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_models'], is_auto_confirmation=gb['is_auto_confirmation'])
-            Tools.copy_files_from_other_folders(gb['folderpath_models'], gb['folderpath_experiments_output_models'], is_auto_confirmation=gb['is_auto_confirmation'])
-            Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/libraries/models"), is_auto_confirmation=gb['is_auto_confirmation'])
-            Tools.copy_files_from_other_folders(gb['folderpath_models'], Path(gb['folderpath_engine'], "engine/libraries/models"), is_auto_confirmation=gb['is_auto_confirmation'])
+            if not gb['is_maintain_files_in_simulator_when_develop_mode']:
+                # 如果是应用实验状态，则复制模型数据与内容到输出文件夹下，另外导出一份到`engine/models`文件夹下
+                Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_models'], is_auto_confirmation=gb['is_auto_confirmation'])
+                Tools.copy_files_from_other_folders(gb['folderpath_models'], gb['folderpath_experiments_output_models'], is_auto_confirmation=gb['is_auto_confirmation'])
+                Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], "engine/libraries/models"), is_auto_confirmation=gb['is_auto_confirmation'])
+                Tools.copy_files_from_other_folders(gb['folderpath_models'], Path(gb['folderpath_engine'], "engine/libraries/models"), is_auto_confirmation=gb['is_auto_confirmation'])
 
             # 导入相关个体众数据库
             Tools.delete_and_recreate_folder(gb['folderpath_experiments_output_agents'], is_auto_confirmation=gb['is_auto_confirmation'])
@@ -387,11 +388,11 @@ def simulator(config: dict):
         pass  # if
 
     # %% 清理 #HACK 未开发
-    ## 删除设置文件夹、模型文件夹内的所有文件，但是保留文件夹
-    Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/config"), is_auto_confirmation=gb['is_auto_confirmation'])
-    Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
-    Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/agents"), is_auto_confirmation=gb['is_auto_confirmation'])
-    Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/settings"), is_auto_confirmation=gb['is_auto_confirmation'])
-    if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
-        Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/models"), is_auto_confirmation=gb['is_auto_confirmation'])
-        pass  # if
+    # ## 删除设置文件夹、模型文件夹内的所有文件，但是保留文件夹
+    # Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/config"), is_auto_confirmation=gb['is_auto_confirmation'])
+    # Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/parameters"), is_auto_confirmation=gb['is_auto_confirmation'])
+    # Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/agents"), is_auto_confirmation=gb['is_auto_confirmation'])
+    # Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/settings"), is_auto_confirmation=gb['is_auto_confirmation'])
+    # if not (gb['is_develop_mode'] and gb['is_maintain_files_in_simulator_when_develop_mode']):
+    #     Tools.delete_and_recreate_folder(Path(gb['folderpath_engine'], r"engine/libraries/models"), is_auto_confirmation=gb['is_auto_confirmation'])
+    #     pass  # if
