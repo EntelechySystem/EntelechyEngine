@@ -85,7 +85,7 @@ def main(gb):
             pass  # if
 
         if is_remove_experiments_works_status_db:
-            os.remove(Path(sgv['folderpath_experiments_output_log'], "experiments_works_status.db"))
+            os.remove(Path(gb['folderpath_experiments_output_log'], "experiments_works_status.db"))
             pass  # if
 
         if is_recreate_experiments_works_status_db:  # 创建数据库并初始化表格
