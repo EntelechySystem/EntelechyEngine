@@ -41,7 +41,7 @@ class Commands:
     # @njit
     def query_unit(units, uid):
         """
-        查找一个单元
+        查找符合条件的一个单元
 
         Args:
             units (np.ndarray): 单元众
@@ -52,6 +52,20 @@ class Commands:
         """
         return np.where(units['uid'] == uid)[0]
         pass  # function
+
+    def query_units(units, uids):
+        """
+        查找符合条件的多个单元
+
+        Args:
+            units (np.ndarray): 单元众
+            uids (np.ndarray): 单元 ID 众
+
+        Returns:
+
+        """
+        return np.where(np.isin(units['uid'], uids))[0]
+        pass
 
     # @njit
     def move_uint(uid, pos_x, pos_y, pos_z, input_units, output_units, dx, dy, dz):
