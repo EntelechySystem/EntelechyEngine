@@ -7,7 +7,7 @@ from engine.externals import np, njit, Optional
 from engine.tools.AlgorithmTools import kmeans_numba
 
 
-def generate_points(set_densityDistance: float = None, set_numPoints: int = None, set_circleRadius: float = None, circle_origin: np.array = np.array([0, 0]), num_samples=30, distribution='Normal', algorithm: Optional[str] = None, sigma: float = 1):
+def generate_points(set_densityDistance: float = None, set_numPoints: int = None, set_circleRadius: float = None, circle_origin: np.ndarray = np.array([0, 0]), num_samples=30, distribution='Normal', algorithm: Optional[str] = None, sigma: float = 1):
     """
     根据一系列初始条件与给定分布生成符合要求的散点。
 
@@ -28,7 +28,7 @@ def generate_points(set_densityDistance: float = None, set_numPoints: int = None
         set_densityDistance: float, 密度距离
         set_numPoints: int, 散点之总数。注意实际生成的数量大约在这个值附近，不会完全等于这个值。
         set_circleRadius: float, 范围半径
-        circle_origin: np.array, 圆心坐标
+        circle_origin: np.ndarray, 圆心坐标
         num_samples: int, 算法每次迭代生成的散点数量
         distribution: str, 期望的散点分布类型
         algorithm: str, 生成散点分布之算法
@@ -36,7 +36,7 @@ def generate_points(set_densityDistance: float = None, set_numPoints: int = None
 
 
     Returns:
-        np.array: 生成的散点
+        np.ndarray: 生成的散点
 
     """
     # 根据给定参数计算其余参数
@@ -109,18 +109,18 @@ def generate_points(set_densityDistance: float = None, set_numPoints: int = None
 
 ## #NOTE 生成符合正态分布的散点
 @njit
-def _generate_points_used_Normal_random_distribution(circle_origin: np.array, circle_radius: float, num_points: int, sigma: float = 1):
+def _generate_points_used_Normal_random_distribution(circle_origin: np.ndarray, circle_radius: float, num_points: int, sigma: float = 1):
     """
     生成符合正态分布的散点。这里采用了简单的方法，即在圆内随机生成一定数量的点。
 
     Args:
-        circle_origin: np.array, 圆心坐标
+        circle_origin: np.ndarray, 圆心坐标
         circle_radius: float, 圆的半径
         num_points: int, 生成的点的数量
         sigma: float, 正态分布的标准差
 
     Returns:
-        np.array: 生成的散点
+        np.ndarray: 生成的散点
 
     """
     points = np.empty((num_points, 2))
@@ -135,17 +135,17 @@ def _generate_points_used_Normal_random_distribution(circle_origin: np.array, ci
 
 ## #NOTE 生成符合随机分布的散点
 @njit
-def _generate_points_used_Uniform_random_distribution(circle_origin: np.array, circle_radius: float, num_points: int):
+def _generate_points_used_Uniform_random_distribution(circle_origin: np.ndarray, circle_radius: float, num_points: int):
     """
     生成符合均匀分布的散点。这里采用了简单的方法，即在圆内随机生成一定数量的点。
 
     Args:
-        circle_origin: np.array, 圆心坐标
+        circle_origin: np.ndarray, 圆心坐标
         circle_radius: float, 圆的半径
         num_points: int, 生成的点的数量
 
     Returns:
-        np.array: 生成的散点
+        np.ndarray: 生成的散点
 
     """
     points = np.empty((num_points, 2))
@@ -173,13 +173,13 @@ def _generate_points_used_PoissonDisk_random_distribution_by_Bridson_algorithm(o
     7. 返回生成的点。
 
     Args:
-        origin: np.array, 圆心坐标
+        origin: np.ndarray, 圆心坐标
         radius: float, 圆的半径
         min_distance: float, 最小距离
         num_samples: int, 每次生成的散点数量
 
     Returns:
-        np.array: 生成的散点
+        np.ndarray: 生成的散点
     """
 
     cell_size = min_distance / np.sqrt(2)
@@ -226,11 +226,11 @@ def _generate_random_point_around_by_Bridson_algorithm(point, min_distance):
     生成一个距离 point 一定距离的随机点。生成一个距离给定点一定距离的随机点。首先生成一个在最小距离和两倍最小距离之间的随机半径，然后生成一个在0和2π之间的随机角度，最后根据半径和角度计算新点的坐标。
 
     Args:
-        point: np.array, 中心点
+        point: np.ndarray, 中心点
         min_distance: float, 最小距离
 
     Returns:
-        np.array: 生成的随机点
+        np.ndarray: 生成的随机点
     """
     r = np.random.uniform(min_distance, 2 * min_distance)
     theta = np.random.uniform(0, 2 * np.pi)
@@ -249,12 +249,12 @@ def _is_valid_sample_by_Bridson_algorithm(sample, origin, radius, min_distance, 
     3. 与邻居散点的距离大于 min_distance
 
     Args:
-        sample: np.array, 生成的散点
-        origin: np.array, 圆心坐标
+        sample: np.ndarray, 生成的散点
+        origin: np.ndarray, 圆心坐标
         radius: float, 圆的半径
         min_distance: float, 最小距离
-        samples: np.array, 已生成的散点
-        grid: np.array, 网格
+        samples: np.ndarray, 已生成的散点
+        grid: np.ndarray, 网格
         cell_size: float, 网格的大小
 
     Returns:
@@ -304,12 +304,12 @@ def _generate_points_used_PoissonDisk_random_distribution_by_Kmeans_algorithm(ci
 
     Args:
         num_points: int, 目标生成的总点数
-        circle_origin: np.array, 圆心坐标
+        circle_origin: np.ndarray, 圆心坐标
         circle_radius: float, 圆的半径
         num_initial_points: int, 初始生成的点的数量
 
     Returns:
-        np.array: 生成的散点
+        np.ndarray: 生成的散点
     """
 
     # 首先在指定的圆内随机生成大量的点
@@ -335,7 +335,7 @@ def _generate_points_used_PoissonDisk_random_distribution_by_Kmeans_algorithm(ci
 def _generate_points_used_PoissonDisk_random_distribution_by_annealing_algorithm(origin, radius, target_num_points, iterations=10, initial_temperature=1.0, cooling_rate=0.99):
     """
     Args:
-        origin: np.array, 圆心坐标
+        origin: np.ndarray, 圆心坐标
         radius: float, 圆的半径
         target_num_points: int, 目标生成的总点数
         iterations: int, 模拟退火的迭代次数
@@ -343,7 +343,7 @@ def _generate_points_used_PoissonDisk_random_distribution_by_annealing_algorithm
         cooling_rate: float, 冷却率
 
     Returns:
-        np.array: 生成的节点
+        np.ndarray: 生成的节点
     """
 
     # 首先在圆内随机生成指定数量的点
@@ -406,7 +406,7 @@ def _generate_points_used_PoissonDisk_random_distribution_by_cKDTree_algorithm(w
 
 
     Returns:
-        np.array: 生成的散点
+        np.ndarray: 生成的散点
     """
     cell_size = min_distance / np.sqrt(2)
     grid_width = int(width / cell_size) + 1
@@ -447,11 +447,11 @@ def _generate_random_point_around_by_cKDTree_algorithm(point, min_distance):
     生成一个距离 point 一定距离的随机点
 
     Args:
-        point: np.array, 中心点
+        point: np.ndarray, 中心点
         min_distance: float, 最小距禽
 
     Returns:
-        np.array: 生成的随机点
+        np.ndarray: 生成的随机点
     """
     r = np.random.uniform(min_distance, 2 * min_distance)
     theta = np.random.uniform(0, 2 * np.pi)
@@ -469,12 +469,12 @@ def _is_valid_sample_by_cKDTree_algorithm(sample, width, height, min_distance, s
     3. 与邻居散点的距离大于 min_distance
 
     Args:
-        sample: np.array, 生成的散点
+        sample: np.ndarray, 生成的散点
         width: int, 空间宽度
         height: int, 空间高度
         min_distance: float, 最小距离
-        samples: np.array, 已生成的散点
-        grid: np.array, 网格
+        samples: np.ndarray, 已生成的散点
+        grid: np.ndarray, 网格
         cell_size: float, 网格的大小
         tree: cKDTree, KD树
 

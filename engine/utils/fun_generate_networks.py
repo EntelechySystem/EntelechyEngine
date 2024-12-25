@@ -10,7 +10,7 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 # 生成连边、路由点，以生成图网络
 
 def generate_network(
-        nodes_pos: np.array,
+        nodes_pos: np.ndarray,
         set_num_edges: int,
         set_num_interpolated_density_distance: float,
         num_edges_per_node: int,
@@ -41,13 +41,13 @@ def generate_network(
 
 
     Args:
-        nodes_pos (np.array): 节点坐标
+        nodes_pos (np.ndarray): 节点坐标
         set_num_edges (int): 设置边数量
         num_edges_per_node (int): 每个节点的边数量
         num_neighbors (int): 邻居节点数量
 
     Returns:
-        edges (np.array): 边
+        edges (np.ndarray): 边
 
     """
     # TODO 调用不同的网络生成机制
@@ -69,13 +69,13 @@ def generate_neighbors_network(nodes_pos, num_edges_per_node, num_neighbors):
     4. 生成边；
 
     Args:
-        nodes_pos (np.array): 节点坐标
+        nodes_pos (np.ndarray): 节点坐标
         set_num_edges (int): 设置边数量
         num_edges_per_node (int): 每个节点的边数量
         num_neighbors (int): 邻居节点数量
 
     Returns:
-        edges (np.array): 边
+        edges (np.ndarray): 边
 
     """
     distance_matrix = _calculate_distance_matrix(nodes_pos)  # 计算节点之间的距离
@@ -92,10 +92,10 @@ def _calculate_distance_matrix(nodes):
     计算节点之间的距离矩阵
 
     Args:
-        nodes (np.array): 节点坐标
+        nodes (np.ndarray): 节点坐标
 
     Returns:
-        np.array: 距离矩阵
+        np.ndarray: 距离矩阵
 
     """
     num_nodes = nodes.shape[0]
@@ -114,7 +114,7 @@ def _select_neighbors(distance_matrix, num_nodes, num_neighbors):
     根据节点之间的距离选择邻居节点
 
     Args:
-        distance_matrix (np.array): 距离矩阵
+        distance_matrix (np.ndarray): 距离矩阵
         num_nodes (int): 节点数量
         num_neighbors (int): 邻居节点数量
 
@@ -150,11 +150,11 @@ def _calculate_weighted_distances(nodes_pos, weights):
     计算节点之间的加权距离。
 
     Args:
-        nodes_pos (np.array): 节点坐标
-        weights (np.array): 权重
+        nodes_pos (np.ndarray): 节点坐标
+        weights (np.ndarray): 权重
 
     Returns:
-        np.array: 加权距离矩阵
+        np.ndarray: 加权距离矩阵
     """
     num_nodes = nodes_pos.shape[0]
     weighted_distances = np.zeros((num_nodes, num_nodes))
@@ -170,16 +170,16 @@ def _calculate_weighted_distances(nodes_pos, weights):
 
 ## #NOTE 使用 Voronoi 图生成网络
 
-def _generate_weighted_voronoi_network(nodes_pos: np.array, weights: np.array = None):
+def _generate_weighted_voronoi_network(nodes_pos: np.ndarray, weights: np.ndarray = None):
     """
     生成加权的 Voronoi 图网络。#TODO 现在生成的仅仅是非加权的 Voronoi 图。后续再增加加权功能
 
     Args:
-        nodes_pos (np.array): 节点坐标
-        weights (np.array): 权重
+        nodes_pos (np.ndarray): 节点坐标
+        weights (np.ndarray): 权重
 
     Returns:
-        edges (np.array): 边
+        edges (np.ndarray): 边
         vor (Voronoi): Voronoi 图
 
     """
