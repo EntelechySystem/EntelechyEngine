@@ -1,7 +1,7 @@
 # EntelechyEngine
 
 
-
+https://img.shields.io/badge/Alpha-Ver0.0.8-red.svg
 
 
 # 版本
